@@ -3,6 +3,7 @@ package com.vincentmet.customquests.network.messages.sync.stc.update;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.network.messages.ICQPacket;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -10,9 +11,11 @@ import java.util.function.Supplier;
 
 import static com.vincentmet.customquests.Ref.CustomQuests.LOGGER;
 
-public class MessageStcSyncUpdateSingleParty {
-	private final int partyId;
+public class MessageStcSyncUpdateSingleParty implements ICQPacket {
+	private int partyId;
 	private JsonObject jsonObject;
+
+	public MessageStcSyncUpdateSingleParty(){}
 
 	private MessageStcSyncUpdateSingleParty(int partyId, JsonObject jsonObject){
 		this.partyId = partyId;
@@ -28,21 +31,25 @@ public class MessageStcSyncUpdateSingleParty {
 		}
 	}
 
-	public static void encode(MessageStcSyncUpdateSingleParty packet, FriendlyByteBuf buffer){
+	@Override
+	public <T extends ICQPacket> void encode(T clazz, FriendlyByteBuf buffer) {
+		MessageStcSyncUpdateSingleParty packet = (MessageStcSyncUpdateSingleParty) clazz;
 		if(PartyHelper.doesPartyExist(packet.partyId) && packet.jsonObject != null){
 			buffer.writeInt(packet.partyId);
 			buffer.writeUtf(packet.jsonObject.toString());
 		}
 	}
 	
-	public static MessageStcSyncUpdateSingleParty decode(FriendlyByteBuf buffer){
+	public MessageStcSyncUpdateSingleParty decode(FriendlyByteBuf buffer){
 		if(buffer.isReadable(6)){//4 for int, 2+ for json
 			return new MessageStcSyncUpdateSingleParty(buffer.readInt(), JsonParser.parseString(buffer.readUtf()).getAsJsonObject());
 		}
 		return null;
 	}
-	
-	public static void handle(final MessageStcSyncUpdateSingleParty message, Supplier<NetworkEvent.Context> ctx) {
+
+	@Override
+	public <T extends ICQPacket> void handle(T clazz, Supplier<NetworkEvent.Context> ctx) {
+		MessageStcSyncUpdateSingleParty message = (MessageStcSyncUpdateSingleParty) clazz;
 		ctx.get().enqueueWork(() -> {
 			if(message!=null){
 				EditorClientProcessor.Update.Parties.updateSingleParty(message.partyId, message.jsonObject);

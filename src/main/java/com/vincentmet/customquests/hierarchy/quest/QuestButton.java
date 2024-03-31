@@ -10,7 +10,7 @@ import com.vincentmet.customquests.gui.editor.IEditorEntry;
 import com.vincentmet.customquests.gui.editor.IEditorPage;
 import com.vincentmet.customquests.helpers.TagHelper;
 import com.vincentmet.customquests.standardcontent.buttonshapes.Shape;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 public class QuestButton implements IJsonObjectProvider, IJsonObjectProcessor, IEditorPage {
 
     private static final IButtonShape DEFAULT_SHAPE = Shape.HEXAGON;
-    private static final IQuestingTexture DEFAULT_ICON = new ItemSlideshowTexture(Blocks.GRASS_BLOCK.getRegistryName(), new ItemStack(Blocks.GRASS_BLOCK));
+    private static final IQuestingTexture DEFAULT_ICON = new ItemSlideshowTexture(ForgeRegistries.BLOCKS.getKey(Blocks.GRASS_BLOCK), new ItemStack(Blocks.GRASS_BLOCK));
     private static final double DEFAULT_SCALE = 1D;
     private final int parentQuestId;
     private IButtonShape shape;
@@ -72,7 +72,7 @@ public class QuestButton implements IJsonObjectProvider, IJsonObjectProcessor, I
         if (icon != null && icon.isValid()){
             this.icon = icon;
         }else{
-            Ref.CustomQuests.LOGGER.warn("'Quest > " + parentQuestId + " > button > icon': The given texture is either null or invalid, defaulting to '"+Blocks.GRASS_BLOCK.getRegistryName()+"'!");
+            Ref.CustomQuests.LOGGER.warn("'Quest > " + parentQuestId + " > button > icon': The given texture is either null or invalid, defaulting to '"+ForgeRegistries.BLOCKS.getKey(Blocks.GRASS_BLOCK)+"'!");
             setIcon(DEFAULT_ICON);
         }
     }
@@ -86,7 +86,7 @@ public class QuestButton implements IJsonObjectProvider, IJsonObjectProcessor, I
             if(ForgeRegistries.ITEMS.containsKey(iconRL)){
                 setIcon(new ItemSlideshowTexture(iconRL, new ItemStack(ForgeRegistries.ITEMS.getValue(iconRL))));
             }else{
-                Ref.CustomQuests.LOGGER.warn("'Quest > " + parentQuestId + " > button > icon': There is no valid item/tag with ResourceLocation '" + iconRL + "' found, defaulting to '"+Blocks.GRASS_BLOCK.getRegistryName()+"'!");
+                Ref.CustomQuests.LOGGER.warn("'Quest > " + parentQuestId + " > button > icon': There is no valid item/tag with ResourceLocation '" + iconRL + "' found, defaulting to '"+ForgeRegistries.BLOCKS.getKey(Blocks.GRASS_BLOCK)+"'!");
                 setIcon(DEFAULT_ICON);
             }
         }
@@ -130,15 +130,15 @@ public class QuestButton implements IJsonObjectProvider, IJsonObjectProcessor, I
                 if(jsonPrimitive.isString()){
                     setIcon(new ResourceLocation(jsonPrimitive.getAsString()));
                 }else{
-                    Ref.CustomQuests.LOGGER.warn("'Quest > " + parentQuestId + " > button > icon': Value is not a String, defaulting to '"+Blocks.GRASS_BLOCK.getRegistryName()+"'!");
+                    Ref.CustomQuests.LOGGER.warn("'Quest > " + parentQuestId + " > button > icon': Value is not a String, defaulting to '"+ForgeRegistries.BLOCKS.getKey(Blocks.GRASS_BLOCK)+"'!");
                     setIcon(DEFAULT_ICON);
                 }
             }else{
-                Ref.CustomQuests.LOGGER.warn("'Quest > " + parentQuestId + " > button > icon': Value is not a JsonPrimitive, please use a String, defaulting to '"+Blocks.GRASS_BLOCK.getRegistryName()+"'!");
+                Ref.CustomQuests.LOGGER.warn("'Quest > " + parentQuestId + " > button > icon': Value is not a JsonPrimitive, please use a String, defaulting to '"+ForgeRegistries.BLOCKS.getKey(Blocks.GRASS_BLOCK)+"'!");
                 setIcon(DEFAULT_ICON);
             }
         }else{
-            Ref.CustomQuests.LOGGER.warn("'Quest > " + parentQuestId + " > button > icon': Not detected, defaulting to '"+Blocks.GRASS_BLOCK.getRegistryName()+"'!");
+            Ref.CustomQuests.LOGGER.warn("'Quest > " + parentQuestId + " > button > icon': Not detected, defaulting to '"+ForgeRegistries.BLOCKS.getKey(Blocks.GRASS_BLOCK)+"'!");
             setIcon(DEFAULT_ICON);
         }
     
@@ -173,17 +173,17 @@ public class QuestButton implements IJsonObjectProvider, IJsonObjectProcessor, I
 
     @Override
     public void addPageEntries(List<IEditorEntry> list) {
-        list.add(new EditorEntryWrapper(new TranslatableComponent(Ref.MODID + ".editor.keys.shape"), new ResourceLocation(Ref.MODID, "resourcelocation"), () -> getShape().getId().toString(), newValueObject -> {
+        list.add(new EditorEntryWrapper(Component.translatable(Ref.MODID + ".editor.keys.shape"), new ResourceLocation(Ref.MODID, "resourcelocation"), () -> getShape().getId().toString(), newValueObject -> {
             ResourceLocation rlValue = new ResourceLocation(newValueObject.toString());
             setShape(rlValue);
             EditorGuiHelper.Update.Quest.Button.requestUpdateShape(parentQuestId, getShape().getId());
         }));
-        list.add(new EditorEntryWrapper(new TranslatableComponent(Ref.MODID + ".editor.keys.icon"), new ResourceLocation(Ref.MODID, "resourcelocation"), () -> getIcon().getResourceLocation().toString(), newValueObject -> {
+        list.add(new EditorEntryWrapper(Component.translatable(Ref.MODID + ".editor.keys.icon"), new ResourceLocation(Ref.MODID, "resourcelocation"), () -> getIcon().getResourceLocation().toString(), newValueObject -> {
             ResourceLocation newRL = ResourceLocation.tryParse(newValueObject.toString());
             setIcon(newRL);
             EditorGuiHelper.Update.Quest.Button.requestUpdateIcon(parentQuestId, getIcon().getResourceLocation());
         }));
-        list.add(new EditorEntryWrapper(new TranslatableComponent(Ref.MODID + ".editor.keys.scale"), new ResourceLocation(Ref.MODID, "double"), this::getScale, newValueObject -> {
+        list.add(new EditorEntryWrapper(Component.translatable(Ref.MODID + ".editor.keys.scale"), new ResourceLocation(Ref.MODID, "double"), this::getScale, newValueObject -> {
             setScale(Double.parseDouble(newValueObject.toString()));
             EditorGuiHelper.Update.Quest.Button.requestUpdateScale(parentQuestId, getScale());
         }));

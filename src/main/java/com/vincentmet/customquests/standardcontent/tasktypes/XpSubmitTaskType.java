@@ -10,11 +10,10 @@ import com.vincentmet.customquests.helpers.IntCounter;
 import com.vincentmet.customquests.helpers.MouseButton;
 import com.vincentmet.customquests.helpers.PlayerBoundSubtaskReference;
 import com.vincentmet.customquests.hierarchy.quest.ItemSlideshowTexture;
-import com.vincentmet.customquests.network.messages.button.MessageTaskButton;
 import com.vincentmet.customquests.network.messages.PacketHandler;
+import com.vincentmet.customquests.network.messages.button.MessageTaskButton;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -29,7 +28,7 @@ import java.util.function.Consumer;
 
 public class XpSubmitTaskType implements ITaskType{
 	private static final ResourceLocation ID = new ResourceLocation(Ref.MODID, "xp_submit");
-	private static final Component TRANSLATION = new TranslatableComponent(Ref.MODID + ".standardcontent.tasks.xp_submit");
+	private static final Component TRANSLATION = Component.translatable(Ref.MODID + ".standardcontent.tasks.xp_submit");
 	public static final List<PlayerBoundSubtaskReference> TRACKING_LIST = new ArrayList<>();
 	private int questId;
 	private int taskId;
@@ -37,7 +36,7 @@ public class XpSubmitTaskType implements ITaskType{
 	
 	private int amount = 1;
 	private boolean inLevels;
-	ItemSlideshowTexture icon = new ItemSlideshowTexture(Items.EXPERIENCE_BOTTLE.getRegistryName(), new ItemStack(Items.EXPERIENCE_BOTTLE));
+	ItemSlideshowTexture icon = new ItemSlideshowTexture(ForgeRegistries.ITEMS.getKey(Items.EXPERIENCE_BOTTLE), new ItemStack(Items.EXPERIENCE_BOTTLE));
 	
 	@Override
 	public ResourceLocation getId(){
@@ -56,7 +55,7 @@ public class XpSubmitTaskType implements ITaskType{
     
     @Override
 	public boolean hasButton(ButtonContext context){
-		context.setText(new TranslatableComponent(Ref.MODID  + ".standardcontent.tasks.button.xp_submit"));
+		context.setText(Component.translatable(Ref.MODID  + ".standardcontent.tasks.button.xp_submit"));
 		context.setOnClick((mouseButton, uuid, questId, taskId) -> {
 			if(!CombinedProgressHelper.isTaskCompleted(uuid, questId, taskId)){
 				PacketHandler.CHANNEL.sendToServer(new MessageTaskButton(questId, taskId));
@@ -126,7 +125,7 @@ public class XpSubmitTaskType implements ITaskType{
 	
 	@Override
 	public String getText(LocalPlayer player){
-		return amount + " " + new TranslatableComponent(Ref.MODID + ".general.experience").getString() + (inLevels?" "+new TranslatableComponent(Ref.MODID + ".general.levels").getString():" " + new TranslatableComponent(Ref.MODID + ".general.points").getString());
+		return amount + " " + Component.translatable(Ref.MODID + ".general.experience").getString() + (inLevels?" "+Component.translatable(Ref.MODID + ".general.levels").getString():" " + Component.translatable(Ref.MODID + ".general.points").getString());
 	}
 	
 	@Override

@@ -14,13 +14,12 @@ import com.vincentmet.customquests.integrations.jei.JEIHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,7 +30,7 @@ import java.util.function.Consumer;
 
 public class BlockPlacedTaskType implements ITaskType, IItemStacksProvider{
 	private static final ResourceLocation ID = new ResourceLocation(Ref.MODID, "block_placed");
-	private static final Component TRANSLATION = new TranslatableComponent(Ref.MODID + ".standardcontent.tasks.block_placed");
+	private static final Component TRANSLATION = Component.translatable(Ref.MODID + ".standardcontent.tasks.block_placed");
 	public static final List<PlayerBoundSubtaskReference> TRACKING_LIST = new ArrayList<>();
 	private int questId;
 	private int taskId;
@@ -68,7 +67,7 @@ public class BlockPlacedTaskType implements ITaskType, IItemStacksProvider{
 		if(!CombinedProgressHelper.isQuestCompleted(player.getUUID(), questId)){
 			BlockEvent.EntityPlaceEvent event = (BlockEvent.EntityPlaceEvent)object;
 			items.stream()
-				 .filter(itemStack->event.getState().getBlock().asItem().getRegistryName().equals(itemStack.getItem().getRegistryName()))
+				 .filter(itemStack->ForgeRegistries.ITEMS.getKey(event.getState().getBlock().asItem()).equals(ForgeRegistries.ITEMS.getKey(itemStack.getItem())))
 				 .forEach(itemStack -> {
 					 CombinedProgressHelper.addValue(player.getUUID(), questId, taskId, subtaskId, 1);
 					 ServerUtils.Packets.SyncToClient.Progress.syncAllProgressAndPartiesToPlayer((ServerPlayer) player);
@@ -104,7 +103,7 @@ public class BlockPlacedTaskType implements ITaskType, IItemStacksProvider{
 		if(items.size()==1){
 			return count + "x " + items.get(0).getItem().getDescription().getString();
 		}else{
-			return count + "x " + new TranslatableComponent(Ref.MODID + ".general.tag").getString() + ": " + Arrays.stream(ogRL.getPath().split("/")).map(StringUtils::capitalize).reduce((s, s2) ->s + "/" + s2).orElse(new TranslatableComponent(Ref.MODID + ".general.tag.empty").getString());
+			return count + "x " + Component.translatable(Ref.MODID + ".general.tag").getString() + ": " + Arrays.stream(ogRL.getPath().split("/")).map(StringUtils::capitalize).reduce((s, s2) ->s + "/" + s2).orElse(Component.translatable(Ref.MODID + ".general.tag.empty").getString());
 		}
 	}
 	
@@ -166,23 +165,23 @@ public class BlockPlacedTaskType implements ITaskType, IItemStacksProvider{
 					if(ogRL != null){
 						if(!TagHelper.Items.doesTagExist(ogRL) && !ForgeRegistries.BLOCKS.containsKey(ogRL)){
 							Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > block': Value is not a valid block that exists in the game, please use a valid block, defaulting to 'minecraft:grass_block'!");
-							ogRL = Blocks.GRASS_BLOCK.getRegistryName();
+							ogRL = ForgeRegistries.BLOCKS.getKey(Blocks.GRASS_BLOCK);
 						}
 					}else{
 						Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > block': Value is not a valid block ResourceLocation, defaulting to 'minecraft:grass_block'!");
-						ogRL = Blocks.GRASS_BLOCK.getRegistryName();
+						ogRL = ForgeRegistries.BLOCKS.getKey(Blocks.GRASS_BLOCK);
 					}
 				}else{
 					Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > block': Value is not a String, defaulting to 'minecraft:grass_block'!");
-					ogRL = Blocks.GRASS_BLOCK.getRegistryName();
+					ogRL = ForgeRegistries.BLOCKS.getKey(Blocks.GRASS_BLOCK);
 				}
 			}else{
 				Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > block': Value is not a JsonPrimitive, please use a String, defaulting to 'minecraft:grass_block'!");
-				ogRL = Blocks.GRASS_BLOCK.getRegistryName();
+				ogRL = ForgeRegistries.BLOCKS.getKey(Blocks.GRASS_BLOCK);
 			}
 		}else{
 			Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > block': Not detected, defaulting to 'minecraft:grass_block'!");
-			ogRL = Blocks.GRASS_BLOCK.getRegistryName();
+			ogRL = ForgeRegistries.BLOCKS.getKey(Blocks.GRASS_BLOCK);
 		}
 	
 		if(json.has("count")){

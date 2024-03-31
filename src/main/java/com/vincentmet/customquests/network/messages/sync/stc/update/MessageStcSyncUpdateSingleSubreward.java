@@ -3,16 +3,20 @@ package com.vincentmet.customquests.network.messages.sync.stc.update;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.network.messages.ICQPacket;
+import com.vincentmet.customquests.network.messages.sync.MessageUpdateSinglePlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class MessageStcSyncUpdateSingleSubreward {
-	private final int questId;
-	private final int rewardId;
-	private final int subrewardId;
+public class MessageStcSyncUpdateSingleSubreward implements ICQPacket {
+	private int questId;
+	private int rewardId;
+	private int subrewardId;
 	private JsonObject jsonObject;
+
+	public MessageStcSyncUpdateSingleSubreward(){}
 
 	private MessageStcSyncUpdateSingleSubreward(int questId, int rewardId, int subrewardId, JsonObject jsonObject){
 		this.questId = questId;
@@ -32,7 +36,9 @@ public class MessageStcSyncUpdateSingleSubreward {
 		}
 	}
 
-	public static void encode(MessageStcSyncUpdateSingleSubreward packet, FriendlyByteBuf buffer){
+	@Override
+	public <T extends ICQPacket> void encode(T clazz, FriendlyByteBuf buffer) {
+		MessageStcSyncUpdateSingleSubreward packet = (MessageStcSyncUpdateSingleSubreward) clazz;
 		if(QuestHelper.doesSubrewardExist(packet.questId, packet.rewardId, packet.subrewardId) && packet.jsonObject != null){
 			buffer.writeInt(packet.questId);
 			buffer.writeInt(packet.rewardId);
@@ -41,14 +47,16 @@ public class MessageStcSyncUpdateSingleSubreward {
 		}
 	}
 	
-	public static MessageStcSyncUpdateSingleSubreward decode(FriendlyByteBuf buffer) {
+	public MessageStcSyncUpdateSingleSubreward decode(FriendlyByteBuf buffer) {
 		if(buffer.isReadable(14)){//4 for int, 4 for int, 4 for int, 2+ for json
 			return new MessageStcSyncUpdateSingleSubreward(buffer.readInt(), buffer.readInt(), buffer.readInt(), JsonParser.parseString(buffer.readUtf()).getAsJsonObject());
 		}
 		return null;
 	}
-	
-	public static void handle(final MessageStcSyncUpdateSingleSubreward message, Supplier<NetworkEvent.Context> ctx) {
+
+	@Override
+	public <T extends ICQPacket> void handle(T clazz, Supplier<NetworkEvent.Context> ctx) {
+		MessageStcSyncUpdateSingleSubreward message = (MessageStcSyncUpdateSingleSubreward) clazz;
 		ctx.get().enqueueWork(() -> {
 			if(message!=null){
 				EditorClientProcessor.Update.Quests.updateSingleSubreward(message.questId, message.rewardId, message.subrewardId, message.jsonObject);

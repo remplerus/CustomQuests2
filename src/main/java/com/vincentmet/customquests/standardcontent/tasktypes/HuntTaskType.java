@@ -11,7 +11,6 @@ import com.vincentmet.customquests.helpers.PlayerBoundSubtaskReference;
 import com.vincentmet.customquests.hierarchy.quest.ItemSlideshowTexture;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
@@ -27,7 +26,7 @@ import java.util.function.Consumer;
 
 public class HuntTaskType implements ITaskType{
 	private static final ResourceLocation ID = new ResourceLocation(Ref.MODID, "hunt");
-	private static final Component TRANSLATION = new TranslatableComponent(Ref.MODID + ".standardcontent.tasks.hunt");
+	private static final Component TRANSLATION = Component.translatable(Ref.MODID + ".standardcontent.tasks.hunt");
 	public static final List<PlayerBoundSubtaskReference> TRACKING_LIST = new ArrayList<>();
 	private int questId;
 	private int taskId;
@@ -36,7 +35,7 @@ public class HuntTaskType implements ITaskType{
 	private ResourceLocation ogRL;
 	private int count;
 	
-	ItemSlideshowTexture icon = new ItemSlideshowTexture(Items.DIAMOND_SWORD.getRegistryName(), new ItemStack(Items.DIAMOND_SWORD));
+	ItemSlideshowTexture icon = new ItemSlideshowTexture(ForgeRegistries.ITEMS.getKey(Items.DIAMOND_SWORD), new ItemStack(Items.DIAMOND_SWORD));
 	private EntityType<?> entityType;
 	
 	@Override
@@ -146,19 +145,19 @@ public class HuntTaskType implements ITaskType{
 					ogRL = ResourceLocation.tryParse(jsonPrimitiveStringValue);
 					if(ogRL == null){
 						Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > entity': Value is not a valid item, please use a valid item id, defaulting to 'minecraft:pig'!");
-						ogRL = EntityType.PIG.getRegistryName();
+						ogRL = ForgeRegistries.ENTITY_TYPES.getKey(EntityType.PIG);
 					}
 				}else{
 					Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > entity': Value is not a String, defaulting to 'minecraft:pig'!");
-					ogRL = EntityType.PIG.getRegistryName();
+					ogRL = ForgeRegistries.ENTITY_TYPES.getKey(EntityType.PIG);
 				}
 			}else{
 				Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > entity': Value is not a JsonPrimitive, please use a String, defaulting to 'minecraft:pig'!");
-				ogRL = EntityType.PIG.getRegistryName();
+				ogRL = ForgeRegistries.ENTITY_TYPES.getKey(EntityType.PIG);
 			}
 		}else{
 			Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > entity': Not detected, defaulting to 'minecraft:pig'!");
-			ogRL = EntityType.PIG.getRegistryName();
+			ogRL = ForgeRegistries.ENTITY_TYPES.getKey(EntityType.PIG);
 		}
 	
 		if(json.has("count")){
@@ -208,7 +207,7 @@ public class HuntTaskType implements ITaskType{
 			Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > icon': Not detected, defaulting to 'minecraft:diamond_sword'!");
 		}
 		
-		entityType = ForgeRegistries.ENTITIES.getValue(ogRL);
+		entityType = ForgeRegistries.ENTITY_TYPES.getValue(ogRL);
 	}
 	
 	@Override

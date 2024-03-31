@@ -1,13 +1,16 @@
 package com.vincentmet.customquests.hierarchy.chapter;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import com.vincentmet.customquests.Ref;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.IJsonArrayProcessor;
+import com.vincentmet.customquests.api.IJsonArrayProvider;
 import com.vincentmet.customquests.gui.editor.EditorEntryWrapper;
 import com.vincentmet.customquests.gui.editor.IEditorEntry;
 import com.vincentmet.customquests.gui.editor.IEditorPage;
 import com.vincentmet.customquests.helpers.IntCounter;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashSet;
@@ -57,7 +60,7 @@ public class QuestList extends HashSet<Integer> implements IJsonArrayProcessor, 
 	@Override
 	public void addPageEntries(List<IEditorEntry> list) {
 		forEach(questId -> {
-			list.add(new EditorEntryWrapper(new TextComponent(""), new ResourceLocation(Ref.MODID, "integer"), () -> questId, newValueObject -> {
+			list.add(new EditorEntryWrapper(Component.literal(""), new ResourceLocation(Ref.MODID, "integer"), () -> questId, newValueObject -> {
 				//todo maybe create a new screen for it, passing important data to it, including the instance of the editor screen, then go back to that instance on close or on save, instead of opening a new screen
 			}));
 		});

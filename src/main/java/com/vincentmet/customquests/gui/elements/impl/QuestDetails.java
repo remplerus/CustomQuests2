@@ -20,9 +20,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
@@ -106,7 +105,7 @@ public class QuestDetails implements IHoverRenderable, CQGuiEventListener {
 	
 	private final Container<Integer> selectedRewardId = new Container<>(-1);
 	
-	private final VariableButton claimRewardButton = new VariableButton(()->0, ()->0, CLAIM_BUTTON_WIDTH, CLAIM_BUTTON_HEIGHT, ButtonState.DISABLED.getButtonTexture(), new TranslatableComponent(Ref.MODID + ".screens.claim").getString(), new Vec2i(0, 0), (mouseButton)->{PacketHandler.CHANNEL.sendToServer(new MessageRewardClaim(screenManager.getCurrentlySelectedQuestId(), selectedRewardId.get()));}, new ArrayList<>());;
+	private final VariableButton claimRewardButton = new VariableButton(()->0, ()->0, CLAIM_BUTTON_WIDTH, CLAIM_BUTTON_HEIGHT, ButtonState.DISABLED.getButtonTexture(), Component.translatable(Ref.MODID + ".screens.claim").getString(), new Vec2i(0, 0), (mouseButton)->{PacketHandler.CHANNEL.sendToServer(new MessageRewardClaim(screenManager.getCurrentlySelectedQuestId(), selectedRewardId.get()));}, new ArrayList<>());;
 	
 	public QuestDetails(QuestingScreenManager screenManager, int x, int y, int width, int height){
 		this.screenManager = screenManager;
@@ -128,7 +127,7 @@ public class QuestDetails implements IHoverRenderable, CQGuiEventListener {
 		if(screenManager.getCurrentlySelectedQuestId()>=0){
 			textToRender.clear();
 			IntCounter cumulativeHeight = new IntCounter(textContentY.getAsInt() - textScrollDistance, FONT.lineHeight + NEWLINE_MARGIN.getAsInt());
-			FormattedText questText = new TextComponent(QuestingStorage.getSidedQuestsMap().get(screenManager.getCurrentlySelectedQuestId()).getText().getStyledText());
+			FormattedText questText = Component.literal(QuestingStorage.getSidedQuestsMap().get(screenManager.getCurrentlySelectedQuestId()).getText().getStyledText());
 			for(FormattedCharSequence line : FONT.split(questText, textContentWidth.getAsInt())){
 				textToRender.add(new Triple<>(line, textContentX.getAsInt(), cumulativeHeight.getValue()));
 				cumulativeHeight.count();
@@ -138,7 +137,7 @@ public class QuestDetails implements IHoverRenderable, CQGuiEventListener {
 	
 	public void reInitTasks(){
 		if(screenManager.getCurrentlySelectedQuestId()>=0){
-			String taskLogic = ChatFormatting.GRAY + new TranslatableComponent(Ref.MODID + ".general.type").getString() + ": [" + QuestingStorage.getSidedQuestsMap().get(screenManager.getCurrentlySelectedQuestId()).getTasks().getLogicType() + "]";
+			String taskLogic = ChatFormatting.GRAY + Component.translatable(Ref.MODID + ".general.type").getString() + ": [" + QuestingStorage.getSidedQuestsMap().get(screenManager.getCurrentlySelectedQuestId()).getTasks().getLogicType() + "]";
 			int strWidth = FONT.width(taskLogic);
 			taskLogicText = new ScrollingLabel(()->taskContentX.getAsInt() + taskContentWidth.getAsInt() - CONTENT_MARGIN.getAsInt() - Math.min(strWidth, taskContentWidth.getAsInt() - (2*CONTENT_MARGIN.getAsInt())), ()->taskContentY.getAsInt() - CONTENT_MARGIN.getAsInt() - FONT.lineHeight, taskLogic, ()->Math.min(strWidth, taskContentWidth.getAsInt() - (2*CONTENT_MARGIN.getAsInt())), 30, 1);
 			
@@ -208,13 +207,13 @@ public class QuestDetails implements IHoverRenderable, CQGuiEventListener {
 			//Set claim button tex
 			if(((QuestHelper.doesRewardExist(screenManager.getCurrentlySelectedQuestId(), selectedRewardId.get()) && QuestingStorage.getSidedQuestsMap().get(screenManager.getCurrentlySelectedQuestId()).getRewards().getLogicType().equals(LogicType.OR)) || QuestingStorage.getSidedQuestsMap().get(screenManager.getCurrentlySelectedQuestId()).getRewards().getLogicType().equals(LogicType.AND)) && !CombinedProgressHelper.isQuestClaimed(clientPlayer.getUUID(), screenManager.getCurrentlySelectedQuestId()) && CombinedProgressHelper.isQuestCompleted(clientPlayer.getUUID(), screenManager.getCurrentlySelectedQuestId())){
 				claimRewardButton.setTexture(ButtonState.NORMAL.getButtonTexture());
-				claimRewardButton.setButtonText(new TranslatableComponent(Ref.MODID + ".screens.claim").getString());
+				claimRewardButton.setButtonText(Component.translatable(Ref.MODID + ".screens.claim").getString());
 			}else if(CombinedProgressHelper.isQuestClaimed(clientPlayer.getUUID(), screenManager.getCurrentlySelectedQuestId())){
 				claimRewardButton.setTexture(ButtonState.DISABLED.getButtonTexture());
-				claimRewardButton.setButtonText(new TranslatableComponent(Ref.MODID + ".screens.claimed").getString());
+				claimRewardButton.setButtonText(Component.translatable(Ref.MODID + ".screens.claimed").getString());
 			}else{
 				claimRewardButton.setTexture(ButtonState.DISABLED.getButtonTexture());
-				claimRewardButton.setButtonText(new TranslatableComponent(Ref.MODID + ".screens.claim").getString());
+				claimRewardButton.setButtonText(Component.translatable(Ref.MODID + ".screens.claim").getString());
 			}
 			//Update reward button X/Y if needed
 			if(claimRewardButton.getX().getAsInt() != rewardContentX.getAsInt() + rewardContentWidth.getAsInt() - (2*CONTENT_MARGIN.getAsInt()) - CLAIM_BUTTON_WIDTH.getAsInt()){
@@ -347,7 +346,7 @@ public class QuestDetails implements IHoverRenderable, CQGuiEventListener {
 			}
 		});
 		rewardTextToRender.forEach(scrollingLabel -> scrollingLabel.render(matrixStack, mouseX, mouseY, partialTicks));
-		FONT.drawShadow(matrixStack, new TranslatableComponent(Ref.MODID + ".screens.rewards").getString(), rewardContentX.getAsInt(), rewardContentY.getAsInt()-rewardScrollDistance, 0xFFFFFF);
+		FONT.drawShadow(matrixStack, Component.translatable(Ref.MODID + ".screens.rewards").getString(), rewardContentX.getAsInt(), rewardContentY.getAsInt()-rewardScrollDistance, 0xFFFFFF);
 		rewardSelectionOutlinesToRender.forEach(quadOutline -> quadOutline.render(matrixStack, mouseX, mouseY, partialTicks));
 		claimRewardButton.render(matrixStack, mouseX, mouseY, partialTicks);
 		GLScissorStack.pop(matrixStack);
@@ -427,7 +426,7 @@ public class QuestDetails implements IHoverRenderable, CQGuiEventListener {
 	
 	private int getTextContentHeight(){
 		if(screenManager.getCurrentlySelectedQuestId()>=0){
-			return FONT.split(new TextComponent(QuestingStorage.getSidedQuestsMap().get(screenManager.getCurrentlySelectedQuestId()).getText().getStyledText()), textContentWidth.getAsInt()).size() * (FONT.lineHeight + NEWLINE_MARGIN.getAsInt());
+			return FONT.split(Component.literal(QuestingStorage.getSidedQuestsMap().get(screenManager.getCurrentlySelectedQuestId()).getText().getStyledText()), textContentWidth.getAsInt()).size() * (FONT.lineHeight + NEWLINE_MARGIN.getAsInt());
 		}
 		return 0;
 	}

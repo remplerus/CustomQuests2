@@ -7,7 +7,7 @@ import com.vincentmet.customquests.event.DataLoadingEvent;
 import com.vincentmet.customquests.event.QuestEvent;
 import com.vincentmet.customquests.helpers.PlayerBoundSubtaskReference;
 import com.vincentmet.customquests.standardcontent.tasktypes.*;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -15,14 +15,14 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -34,14 +34,14 @@ import java.util.UUID;
 @Mod.EventBusSubscriber(modid = Ref.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ForgeEventHandler{
 	@SubscribeEvent
-	public static void onWorldStart(WorldEvent.Load event){
+	public static void onWorldStart(LevelEvent.Load event){
 		//Main
-		if(event.getWorld() instanceof ServerLevel && event.getWorld().dimensionType().equals(DimensionType.DEFAULT_OVERWORLD)){
-			Ref.currentServerInstance = ((ServerLevel)event.getWorld()).getServer();
-			Ref.currentWorldDirectory = ((ServerLevel)event.getWorld()).getServer().getWorldPath(new LevelResource("."));
+		if(event.getLevel() instanceof ServerLevel && event.getLevel().dimensionType().effectsLocation().equals(BuiltinDimensionTypes.OVERWORLD_EFFECTS)){
+			Ref.currentServerInstance = ((ServerLevel)event.getLevel()).getServer();
+			Ref.currentWorldDirectory = ((ServerLevel)event.getLevel()).getServer().getWorldPath(new LevelResource("."));
 			Ref.currentProgressDirectory = Ref.currentWorldDirectory.resolve(Ref.MODID);
 			Ref.progressBackupDirectory = Ref.currentProgressDirectory.resolve("backups");
-			if(!event.getWorld().isClientSide()){
+			if(!event.getLevel().isClientSide()){
 				MinecraftForge.EVENT_BUS.post(new DataLoadingEvent.Pre());
 				CQHelper.readAllFilesAndPutIntoHashmaps();
 				MinecraftForge.EVENT_BUS.post(new DataLoadingEvent.Post());
@@ -52,14 +52,14 @@ public class ForgeEventHandler{
 	@SubscribeEvent
 	public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event){
 		//Main
-		CQHelper.generateMissingProgress(event.getPlayer().getUUID());
+		CQHelper.generateMissingProgress(event.getEntity().getUUID());
 		CQHelper.generateMissingPartyProgress();
-		ServerUtils.Packets.SyncToClient.Data.syncAllChaptersAndQuestsToPlayer((ServerPlayer)event.getPlayer());
-		ServerUtils.Packets.SyncToClient.Progress.syncAllProgressAndPartiesToPlayer((ServerPlayer)event.getPlayer());
-		ServerUtils.Packets.SyncToClient.Config.syncConfigToPlayer((ServerPlayer)event.getPlayer());
+		ServerUtils.Packets.SyncToClient.Data.syncAllChaptersAndQuestsToPlayer((ServerPlayer)event.getEntity());
+		ServerUtils.Packets.SyncToClient.Progress.syncAllProgressAndPartiesToPlayer((ServerPlayer)event.getEntity());
+		ServerUtils.Packets.SyncToClient.Config.syncConfigToPlayer((ServerPlayer)event.getEntity());
 		
 		if(Config.SidedConfig.giveDeviceOnFirstLogin()){
-			if(event.getPlayer() instanceof ServerPlayer player){
+			if(event.getEntity() instanceof ServerPlayer player){
 				if(player.getStats().getValue(Stats.CUSTOM.get(Stats.LEAVE_GAME)) == 0){
 					ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Objects.Items.QUESTING_DEVICE));
 				}
@@ -68,19 +68,19 @@ public class ForgeEventHandler{
 	}
 	
 	@SubscribeEvent
-	public static void onWorldSave(WorldEvent.Save event){
+	public static void onWorldSave(LevelEvent.Save event){
 		//Main
-		if(event.getWorld() instanceof ServerLevel && event.getWorld().dimensionType().equals(DimensionType.DEFAULT_OVERWORLD)){
+		if(event.getLevel() instanceof ServerLevel && event.getLevel().dimensionType().equals(BuiltinDimensionTypes.OVERWORLD.location())){
 			CQHelper.writeQuestsAndChaptersToFile(Ref.PATH_CONFIG, Ref.FILENAME_QUESTS + Ref.FILE_EXT_JSON);
 			CQHelper.writePlayersAndPartiesToFile(Ref.currentProgressDirectory, Ref.FILENAME_PARTIES + Ref.FILE_EXT_JSON);
 		}
 	}
 
 	@SubscribeEvent
-	public static void onWorldTick(TickEvent.WorldTickEvent event){
+	public static void onWorldTick(TickEvent.LevelTickEvent event){
 		//Main
-		if(event.side.isServer() && event.world.getGameTime() % 100 == 0 && event.phase == TickEvent.Phase.START){
-			event.world.players().forEach(playerEntity -> MinecraftForge.EVENT_BUS.post(new CheckCycleEvent(playerEntity)));
+		if(event.side.isServer() && event.level.getGameTime() % 100 == 0 && event.phase == TickEvent.Phase.START){
+			event.level.players().forEach(playerEntity -> MinecraftForge.EVENT_BUS.post(new CheckCycleEvent(playerEntity)));
 		}
 	}
 	
@@ -88,7 +88,7 @@ public class ForgeEventHandler{
 	public static void onCraft(PlayerEvent.ItemCraftedEvent event){
 		//Standard Content
 		if(EffectiveSide.get().isServer()){
-			UUID uuid = event.getPlayer().getUUID();
+			UUID uuid = event.getEntity().getUUID();
 			ItemCraftTaskType.TRACKING_LIST
 					.stream()
 					.filter(entry -> entry.getPlayer().toString().equals(uuid.toString()))
@@ -96,7 +96,7 @@ public class ForgeEventHandler{
 						QuestingStorage.getSidedQuestsMap().get(entry.getQuestId())
 						                                 .getTasks().get(entry.getTaskId())
 						                                 .getSubtasks().get(entry.getSubtaskId())
-						                                 .getSubtask().executeSubtaskCheck(event.getPlayer(), event);
+						                                 .getSubtask().executeSubtaskCheck(event.getEntity(), event);
 					});
 		}
 	}
@@ -190,7 +190,7 @@ public class ForgeEventHandler{
 					ServerPlayer playerEntity = server.getPlayerList().getPlayer(uuid);
 					if(playerEntity != null){
 						try{
-							String title = new TranslatableComponent("customquests.general.quest_completed").getString();
+							String title = Component.translatable("customquests.general.quest_completed").getString();
 							server.getCommands().getDispatcher().execute("title " + playerEntity.getDisplayName().getString() + " title \"" + title + "\"", server.createCommandSourceStack().withSuppressedOutput());
 							server.getCommands().getDispatcher().execute("title " + playerEntity.getDisplayName().getString() + " subtitle \"" + QuestHelper.getQuestFromId(event.getQuestId()).getTitle().getStyledText()  + " #" + event.getQuestId() + "\"", server.createCommandSourceStack().withSuppressedOutput());
 						}catch(CommandSyntaxException ignored){}
@@ -198,7 +198,7 @@ public class ForgeEventHandler{
 				});
 			}else{
 				try{
-					String title = new TranslatableComponent("customquests.general.quest_completed").getString();
+					String title = Component.translatable("customquests.general.quest_completed").getString();
 					server.getCommands().getDispatcher().execute("title " + event.getPlayer().getDisplayName().getString() + " title \"" + title + "\"", server.createCommandSourceStack().withSuppressedOutput());
 					server.getCommands().getDispatcher().execute("title " + event.getPlayer().getDisplayName().getString() + " subtitle \"" + QuestHelper.getQuestFromId(event.getQuestId()).getTitle().getStyledText()  + " #" + event.getQuestId() + "\"", server.createCommandSourceStack().withSuppressedOutput());
 				}catch(CommandSyntaxException ignored){}

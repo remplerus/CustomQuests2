@@ -9,7 +9,7 @@ import com.vincentmet.customquests.gui.editor.EditorEntryWrapper;
 import com.vincentmet.customquests.gui.editor.IEditorEntry;
 import com.vincentmet.customquests.gui.editor.IEditorPage;
 import com.vincentmet.customquests.standardcontent.texttypes.PlainTextTextType;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
@@ -110,11 +110,11 @@ public class QuestSubtitleTextType implements IJsonObjectProcessor, IJsonObjectP
 
     @Override
     public void addPageEntries(List<IEditorEntry> list) {
-        list.add(new EditorEntryWrapper(new TextComponent("Type"), new ResourceLocation(Ref.MODID, "resourcelocation"), () -> type.getId().toString(), newValueObject -> {
+        list.add(new EditorEntryWrapper(Component.literal("Type"), new ResourceLocation(Ref.MODID, "resourcelocation"), () -> type.getId().toString(), newValueObject -> {
             setType(new ResourceLocation(newValueObject.toString()));
             EditorGuiHelper.Update.Quest.Subtitle.requestUpdateType(parentId, getType().getId());
         }));
-        list.add(new EditorEntryWrapper(new TextComponent("Text"), new ResourceLocation(Ref.MODID, "plaintext"), () -> type.getOgText(), newValueObject -> {
+        list.add(new EditorEntryWrapper(Component.literal("Text"), new ResourceLocation(Ref.MODID, "plaintext"), () -> type.getOgText(), newValueObject -> {
             setText(newValueObject.toString());
             EditorGuiHelper.Update.Quest.Subtitle.requestUpdateText(parentId, getOgText());
         }));

@@ -10,12 +10,16 @@ import com.vincentmet.customquests.network.messages.editor.cts.requests.create.*
 import com.vincentmet.customquests.network.messages.editor.cts.requests.delete.*;
 import com.vincentmet.customquests.network.messages.editor.cts.requests.update.chapter.*;
 import com.vincentmet.customquests.network.messages.editor.cts.requests.update.quest.*;
-import com.vincentmet.customquests.network.messages.sync.*;
+import com.vincentmet.customquests.network.messages.sync.MessageUpdateDelivery;
+import com.vincentmet.customquests.network.messages.sync.MessageUpdateServerSettings;
+import com.vincentmet.customquests.network.messages.sync.MessageUpdateSinglePlayer;
+import com.vincentmet.customquests.network.messages.sync.MessageUpdateSinglePlayerQuestProgress;
 import com.vincentmet.customquests.network.messages.sync.stc.clear.*;
 import com.vincentmet.customquests.network.messages.sync.stc.delete.*;
 import com.vincentmet.customquests.network.messages.sync.stc.update.*;
 import com.vincentmet.customquests.standardcontent.messages.MessageCheckboxClick;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
@@ -33,21 +37,29 @@ public class PacketHandler{
 	private static int nextID() {
 		return messageID++;
 	}
+
+	public static <T extends ICQPacket> void registerPacket(T packet, NetworkDirection networkDirection){
+		PacketHandler.CHANNEL.messageBuilder(packet.getClass(), nextID(), networkDirection)
+				.encoder(packet::encode)
+				.decoder(packet::decode)
+				.consumerMainThread(packet::handle)
+				.add();
+	}
 	
 	public static void init() {//todo add A LOT A LOT A LOT of new packets here
 		//Main
 		//button
-		CHANNEL.registerMessage(nextID(), MessageRewardClaim.class, MessageRewardClaim::encode, MessageRewardClaim::decode, MessageRewardClaim::handle);
-		CHANNEL.registerMessage(nextID(), MessageTaskButton.class, MessageTaskButton::encode, MessageTaskButton::decode, MessageTaskButton::handle);
+		registerPacket(new MessageRewardClaim(), NetworkDirection.PLAY_TO_SERVER);
+		registerPacket(new MessageTaskButton(), NetworkDirection.PLAY_TO_SERVER);
 		//command
-		CHANNEL.registerMessage(nextID(), MessageDiscord.class, MessageDiscord::encode, MessageDiscord::decode, MessageDiscord::handle);
-		CHANNEL.registerMessage(nextID(), MessageHand.class, MessageHand::encode, MessageHand::decode, MessageHand::handle);
-		CHANNEL.registerMessage(nextID(), MessageOpenEditor.class, MessageOpenEditor::encode, MessageOpenEditor::decode, MessageOpenEditor::handle);
+		registerPacket(new MessageDiscord(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageHand(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageOpenEditor(), NetworkDirection.PLAY_TO_CLIENT);
 		//editor
 		//editor/cts
 		//editor/cts/requests
 		//editor/cts/requests/create
-		CHANNEL.registerMessage(nextID(), MessageEditorRequestCreateChapter.class, MessageEditorRequestCreateChapter::encode, MessageEditorRequestCreateChapter::decode, MessageEditorRequestCreateChapter::handle);
+		/*CHANNEL.registerMessage(nextID(), MessageEditorRequestCreateChapter.class, MessageEditorRequestCreateChapter::encode, MessageEditorRequestCreateChapter::decode, MessageEditorRequestCreateChapter::handle);
 		CHANNEL.registerMessage(nextID(), MessageEditorRequestCreateQuest.class, MessageEditorRequestCreateQuest::encode, MessageEditorRequestCreateQuest::decode, MessageEditorRequestCreateQuest::handle);
 		CHANNEL.registerMessage(nextID(), MessageEditorRequestCreateReward.class, MessageEditorRequestCreateReward::encode, MessageEditorRequestCreateReward::decode, MessageEditorRequestCreateReward::handle);
 		CHANNEL.registerMessage(nextID(), MessageEditorRequestCreateSubreward.class, MessageEditorRequestCreateSubreward::encode, MessageEditorRequestCreateSubreward::decode, MessageEditorRequestCreateSubreward::handle);
@@ -91,49 +103,46 @@ public class PacketHandler{
 		CHANNEL.registerMessage(nextID(), MessageEditorRequestUpdateQuestTextType.class, MessageEditorRequestUpdateQuestTextType::encode, MessageEditorRequestUpdateQuestTextType::decode, MessageEditorRequestUpdateQuestTextType::handle);
 		CHANNEL.registerMessage(nextID(), MessageEditorRequestUpdateQuestTitleText.class, MessageEditorRequestUpdateQuestTitleText::encode, MessageEditorRequestUpdateQuestTitleText::decode, MessageEditorRequestUpdateQuestTitleText::handle);
 		CHANNEL.registerMessage(nextID(), MessageEditorRequestUpdateQuestTitleType.class, MessageEditorRequestUpdateQuestTitleType::encode, MessageEditorRequestUpdateQuestTitleType::decode, MessageEditorRequestUpdateQuestTitleType::handle);
-		//sync
-		CHANNEL.registerMessage(nextID(), MessageUpdateDelivery.class, MessageUpdateDelivery::encode, MessageUpdateDelivery::decode, MessageUpdateDelivery::handle);
-		CHANNEL.registerMessage(nextID(), MessageUpdateServerSettings.class, MessageUpdateServerSettings::encode, MessageUpdateServerSettings::decode, MessageUpdateServerSettings::handle);
+		*///sync
+		registerPacket(new MessageUpdateDelivery(), NetworkDirection.PLAY_TO_SERVER);
+		registerPacket(new MessageUpdateServerSettings(), NetworkDirection.PLAY_TO_CLIENT);
 		//sync/stc
 		//sync/stc/clear
-		CHANNEL.registerMessage(nextID(), MessageStcSyncTempClearAllChapters.class, MessageStcSyncTempClearAllChapters::encode, MessageStcSyncTempClearAllChapters::decode, MessageStcSyncTempClearAllChapters::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncTempClearAllParties.class, MessageStcSyncTempClearAllParties::encode, MessageStcSyncTempClearAllParties::decode, MessageStcSyncTempClearAllParties::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncTempClearAllPlayers.class, MessageStcSyncTempClearAllPlayers::encode, MessageStcSyncTempClearAllPlayers::decode, MessageStcSyncTempClearAllPlayers::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncTempClearAllQuests.class, MessageStcSyncTempClearAllQuests::encode, MessageStcSyncTempClearAllQuests::decode, MessageStcSyncTempClearAllQuests::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncTempClearSingleQuest.class, MessageStcSyncTempClearSingleQuest::encode, MessageStcSyncTempClearSingleQuest::decode, MessageStcSyncTempClearSingleQuest::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncTempClearSingleReward.class, MessageStcSyncTempClearSingleReward::encode, MessageStcSyncTempClearSingleReward::decode, MessageStcSyncTempClearSingleReward::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncTempClearSingleSubreward.class, MessageStcSyncTempClearSingleSubreward::encode, MessageStcSyncTempClearSingleSubreward::decode, MessageStcSyncTempClearSingleSubreward::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncTempClearSingleSubtask.class, MessageStcSyncTempClearSingleSubtask::encode, MessageStcSyncTempClearSingleSubtask::decode, MessageStcSyncTempClearSingleSubtask::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncTempClearSingleTask.class, MessageStcSyncTempClearSingleTask::encode, MessageStcSyncTempClearSingleTask::decode, MessageStcSyncTempClearSingleTask::handle);
+		registerPacket(new MessageStcSyncTempClearAllChapters(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncTempClearAllParties(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncTempClearAllPlayers(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncTempClearAllQuests(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncTempClearSingleQuest(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncTempClearSingleReward(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncTempClearSingleSubreward(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncTempClearSingleSubtask(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncTempClearSingleTask(), NetworkDirection.PLAY_TO_CLIENT);
 		//sync/stc/delete
-		CHANNEL.registerMessage(nextID(), MessageStcSyncDeleteAllChapters.class, MessageStcSyncDeleteAllChapters::encode, MessageStcSyncDeleteAllChapters::decode, MessageStcSyncDeleteAllChapters::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncDeleteAllQuests.class, MessageStcSyncDeleteAllQuests::encode, MessageStcSyncDeleteAllQuests::decode, MessageStcSyncDeleteAllQuests::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncDeleteSingleChapter.class, MessageStcSyncDeleteSingleChapter::encode, MessageStcSyncDeleteSingleChapter::decode, MessageStcSyncDeleteSingleChapter::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncDeleteSingleParty.class, MessageStcSyncDeleteSingleParty::encode, MessageStcSyncDeleteSingleParty::decode, MessageStcSyncDeleteSingleParty::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncDeleteSinglePlayer.class, MessageStcSyncDeleteSinglePlayer::encode, MessageStcSyncDeleteSinglePlayer::decode, MessageStcSyncDeleteSinglePlayer::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncDeleteSingleQuest.class, MessageStcSyncDeleteSingleQuest::encode, MessageStcSyncDeleteSingleQuest::decode, MessageStcSyncDeleteSingleQuest::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncDeleteSingleReward.class, MessageStcSyncDeleteSingleReward::encode, MessageStcSyncDeleteSingleReward::decode, MessageStcSyncDeleteSingleReward::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncDeleteSingleSubreward.class, MessageStcSyncDeleteSingleSubreward::encode, MessageStcSyncDeleteSingleSubreward::decode, MessageStcSyncDeleteSingleSubreward::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncDeleteSingleSubtask.class, MessageStcSyncDeleteSingleSubtask::encode, MessageStcSyncDeleteSingleSubtask::decode, MessageStcSyncDeleteSingleSubtask::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncDeleteSingleTask.class, MessageStcSyncDeleteSingleTask::encode, MessageStcSyncDeleteSingleTask::decode, MessageStcSyncDeleteSingleTask::handle);
+		registerPacket(new MessageStcSyncDeleteAllChapters(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncDeleteAllQuests(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncDeleteSingleChapter(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncDeleteSingleParty(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncDeleteSinglePlayer(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncDeleteSingleQuest(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncDeleteSingleReward(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncDeleteSingleSubreward(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncDeleteSingleSubtask(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncDeleteSingleTask(), NetworkDirection.PLAY_TO_CLIENT);
 		//sync/stc/update
-		CHANNEL.registerMessage(nextID(), MessageStcSyncUpdateSingleChapter.class, MessageStcSyncUpdateSingleChapter::encode, MessageStcSyncUpdateSingleChapter::decode, MessageStcSyncUpdateSingleChapter::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncUpdateSingleParty.class, MessageStcSyncUpdateSingleParty::encode, MessageStcSyncUpdateSingleParty::decode, MessageStcSyncUpdateSingleParty::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncUpdateSinglePlayer.class, MessageStcSyncUpdateSinglePlayer::encode, MessageStcSyncUpdateSinglePlayer::decode, MessageStcSyncUpdateSinglePlayer::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncUpdateSingleQuest.class, MessageStcSyncUpdateSingleQuest::encode, MessageStcSyncUpdateSingleQuest::decode, MessageStcSyncUpdateSingleQuest::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncUpdateSingleReward.class, MessageStcSyncUpdateSingleReward::encode, MessageStcSyncUpdateSingleReward::decode, MessageStcSyncUpdateSingleReward::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncUpdateSingleSubreward.class, MessageStcSyncUpdateSingleSubreward::encode, MessageStcSyncUpdateSingleSubreward::decode, MessageStcSyncUpdateSingleSubreward::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncUpdateSingleSubtask.class, MessageStcSyncUpdateSingleSubtask::encode, MessageStcSyncUpdateSingleSubtask::decode, MessageStcSyncUpdateSingleSubtask::handle);
-		CHANNEL.registerMessage(nextID(), MessageStcSyncUpdateSingleTask.class, MessageStcSyncUpdateSingleTask::encode, MessageStcSyncUpdateSingleTask::decode, MessageStcSyncUpdateSingleTask::handle);
+		registerPacket(new MessageStcSyncUpdateSingleChapter(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncUpdateSingleParty(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncUpdateSinglePlayer(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncUpdateSingleQuest(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncUpdateSingleReward(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncUpdateSingleSubreward(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncUpdateSingleSubtask(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageStcSyncUpdateSingleTask(), NetworkDirection.PLAY_TO_CLIENT);
 
-
-
-		CHANNEL.registerMessage(nextID(), MessageUpdateDelivery.class, MessageUpdateDelivery::encode, MessageUpdateDelivery::decode, MessageUpdateDelivery::handle);
-		CHANNEL.registerMessage(nextID(), MessageUpdateSinglePlayer.class, MessageUpdateSinglePlayer::encode, MessageUpdateSinglePlayer::decode, MessageUpdateSinglePlayer::handle);
-		CHANNEL.registerMessage(nextID(), MessageUpdateSinglePlayerQuestProgress.class, MessageUpdateSinglePlayerQuestProgress::encode, MessageUpdateSinglePlayerQuestProgress::decode, MessageUpdateSinglePlayerQuestProgress::handle);
-		CHANNEL.registerMessage(nextID(), MessageReinitQuestingCanvas.class, MessageReinitQuestingCanvas::encode, MessageReinitQuestingCanvas::decode, MessageReinitQuestingCanvas::handle);
+		registerPacket(new MessageUpdateSinglePlayer(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageUpdateSinglePlayerQuestProgress(), NetworkDirection.PLAY_TO_CLIENT);
+		registerPacket(new MessageReinitQuestingCanvas(), NetworkDirection.PLAY_TO_CLIENT);
 
 		//Standard Content
-		CHANNEL.registerMessage(nextID(), MessageCheckboxClick.class, MessageCheckboxClick::encode, MessageCheckboxClick::decode, MessageCheckboxClick::handle);
+		registerPacket(new MessageCheckboxClick(), NetworkDirection.PLAY_TO_SERVER);
 	}
 }

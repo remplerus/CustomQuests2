@@ -14,8 +14,8 @@ import com.vincentmet.customquests.helpers.Triple;
 import com.vincentmet.customquests.helpers.math.Vec2i;
 import com.vincentmet.customquests.helpers.rendering.VariableButton;
 import com.vincentmet.customquests.helpers.rendering.VariableSlot;
-import com.vincentmet.customquests.network.messages.sync.MessageUpdateDelivery;
 import com.vincentmet.customquests.network.messages.PacketHandler;
+import com.vincentmet.customquests.network.messages.sync.MessageUpdateDelivery;
 import com.vincentmet.customquests.tileentity.DeliveryBlockTileEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -24,8 +24,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
@@ -49,11 +47,11 @@ public class DeliveryScreen extends Screen {
 	public static final IntSupplier SLOT_SIZE = ()->18;
 	private static final LocalPlayer clientPlayer = Minecraft.getInstance().player;
 	
-	private static final Component TRANSLATION_SELECT_SUBTASK = new TranslatableComponent(Ref.MODID + ".standardcontent.delivery.subtask_select");
-	private static final Component TRANSLATION_ITEMS_TO_HAND_IN = new TranslatableComponent(Ref.MODID + ".standardcontent.tasks.item_submit");
-	private static final Component TRANSLATION_QUEST = new TranslatableComponent(Ref.MODID + ".general.quest");
-	private static final Component TRANSLATION_TASK = new TranslatableComponent(Ref.MODID + ".general.task");
-	private static final Component TRANSLATION_SUBTASK = new TranslatableComponent(Ref.MODID + ".general.subtask");
+	private static final Component TRANSLATION_SELECT_SUBTASK = Component.translatable(Ref.MODID + ".standardcontent.delivery.subtask_select");
+	private static final Component TRANSLATION_ITEMS_TO_HAND_IN = Component.translatable(Ref.MODID + ".standardcontent.tasks.item_submit");
+	private static final Component TRANSLATION_QUEST = Component.translatable(Ref.MODID + ".general.quest");
+	private static final Component TRANSLATION_TASK = Component.translatable(Ref.MODID + ".general.task");
+	private static final Component TRANSLATION_SUBTASK = Component.translatable(Ref.MODID + ".general.subtask");
 	
 	private final BlockPos tilePos;
 	
@@ -88,7 +86,7 @@ public class DeliveryScreen extends Screen {
 	
 	
 	public DeliveryScreen(BlockPos pos){
-		super(new TranslatableComponent("block.customquests.questing_block"));
+		super(Component.translatable("block.customquests.questing_block"));
 		tilePos = pos;
 	}
 	
@@ -114,8 +112,8 @@ public class DeliveryScreen extends Screen {
 		                                 .filter(entry -> CombinedProgressHelper.isQuestUnlocked(clientPlayer.getUUID(), entry.getKey()) && !CombinedProgressHelper.isQuestCompleted(clientPlayer.getUUID(), entry.getKey()))
 		                                 .forEach(entry -> {
 			                                 List<Component> tooltips = new ArrayList<>();
-			                                 tooltips.add(new TextComponent(entry.getValue().getTitle() + " #" + entry.getKey()));
-			                                 tooltips.add(new TextComponent(entry.getValue().getSubtitle().toString()));
+			                                 tooltips.add(Component.literal(entry.getValue().getTitle() + " #" + entry.getKey()));
+			                                 tooltips.add(Component.literal(entry.getValue().getSubtitle().toString()));
 			                                 questsList.add(new TextButton(questListX, ()->cumulativeHeight.getValue(), ()->(width>>2) - 30, MENUS_BUTTON_HEIGHT, entry.getValue().getTitle().toString(), ButtonState.NORMAL, (mouseButton) -> {
 				                                 currentSubtask.setL(entry.getKey());
 			                                 }, tooltips));
@@ -197,7 +195,7 @@ public class DeliveryScreen extends Screen {
 				checkmarkText = ChatFormatting.GREEN + " \u2713";
 			String subtaskText = QuestingStorage.getSidedQuestsMap().get(currentSubtask.getLeft()).getTasks().get(currentSubtask.getMiddle()).getSubtasks().get(currentSubtask.getRight()).getSubtask().getText(clientPlayer) + checkmarkText;
 			if(Minecraft.getInstance().font.width(subtaskText) + 5 >= (Minecraft.getInstance().getWindow().getGuiScaledWidth()>>1) - 90){
-				subtaskText = Minecraft.getInstance().font.split(new TextComponent(subtaskText), (Minecraft.getInstance().getWindow().getGuiScaledWidth() >> 1) - 90) + "...";//todo test this split function
+				subtaskText = Minecraft.getInstance().font.split(Component.literal(subtaskText), (Minecraft.getInstance().getWindow().getGuiScaledWidth() >> 1) - 90) + "...";//todo test this split function
 			}
 			Minecraft.getInstance().font.drawShadow(matrixStack, subtaskText, 27 + (Minecraft.getInstance().getWindow().getGuiScaledWidth() >> 1) + 25, 55 + 10 - Minecraft.getInstance().font.lineHeight / 2, 0xFFFFFF);
 			QuestingStorage.getSidedQuestsMap().get(currentSubtask.getLeft()).getTasks().get(currentSubtask.getMiddle()).getSubtasks().get(currentSubtask.getRight()).getSubtask().getIcon(clientPlayer).render(matrixStack, 1, (Minecraft.getInstance().getWindow().getGuiScaledWidth() >> 1) + 25 + 1, 55 + 1, 0, 0, mouseX, mouseY);

@@ -2,33 +2,41 @@ package com.vincentmet.customquests.network.messages.sync.stc.delete;
 
 import com.vincentmet.customquests.api.ClientUtils;
 import com.vincentmet.customquests.api.EditorClientProcessor;
+import com.vincentmet.customquests.network.messages.ICQPacket;
+import com.vincentmet.customquests.network.messages.sync.MessageUpdateSinglePlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class MessageStcSyncDeleteSingleTask {
-    private final int questId;
-    private final int taskId;
+public class MessageStcSyncDeleteSingleTask implements ICQPacket {
+    private int questId;
+    private int taskId;
+
+    public MessageStcSyncDeleteSingleTask(){}
 
     public MessageStcSyncDeleteSingleTask(int questId, int taskId){
         this.questId = questId;
         this.taskId = taskId;
     }
-    
-    public static void encode(MessageStcSyncDeleteSingleTask packet, FriendlyByteBuf buffer){
+
+    @Override
+    public <T extends ICQPacket> void encode(T clazz, FriendlyByteBuf buffer) {
+        MessageStcSyncDeleteSingleTask packet = (MessageStcSyncDeleteSingleTask) clazz;
         buffer.writeInt(packet.questId);
         buffer.writeInt(packet.taskId);
     }
-    
-    public static MessageStcSyncDeleteSingleTask decode(FriendlyByteBuf buffer) {
+
+    public MessageStcSyncDeleteSingleTask decode(FriendlyByteBuf buffer) {
         if(buffer.isReadable(8)){
             return new MessageStcSyncDeleteSingleTask(buffer.readInt(), buffer.readInt());
         }
         return null;
     }
-    
-    public static void handle(final MessageStcSyncDeleteSingleTask message, Supplier<NetworkEvent.Context> ctx) {
+
+    @Override
+    public <T extends ICQPacket> void handle(T clazz, Supplier<NetworkEvent.Context> ctx) {
+        MessageStcSyncDeleteSingleTask message = (MessageStcSyncDeleteSingleTask) clazz;
         ctx.get().enqueueWork(() -> {
             if(message!=null){
                 EditorClientProcessor.Delete.deleteSingleTask(message.questId, message.taskId);

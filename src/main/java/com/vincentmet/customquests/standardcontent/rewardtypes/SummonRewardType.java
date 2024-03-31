@@ -8,7 +8,7 @@ import com.vincentmet.customquests.Ref;
 import com.vincentmet.customquests.api.IRewardType;
 import com.vincentmet.customquests.helpers.MouseButton;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -38,7 +38,7 @@ public class SummonRewardType implements IRewardType{
     @Override
 	public void executeReward(ServerPlayer player){
 		for(int i=0; i<count;i++){
-			(player.getLevel()).addFreshEntity(Objects.requireNonNull(entity.create((ServerLevel) player.getLevel(), new CompoundTag(), new TranslatableComponent("Your Reward <3"), player, player.blockPosition(), MobSpawnType.COMMAND, true, false)));
+			(player.getLevel()).addFreshEntity(Objects.requireNonNull(entity.create((ServerLevel) player.getLevel(), new CompoundTag(), Component.translatable("Your Reward <3"), player, player.blockPosition(), MobSpawnType.COMMAND, true, false)));
 		}
 	}
 	
@@ -147,7 +147,7 @@ public class SummonRewardType implements IRewardType{
 					String jsonPrimitiveStringValue = jsonPrimitive.getAsString();
 					ResourceLocation rl = ResourceLocation.tryParse(jsonPrimitiveStringValue);
 					if(rl != null){
-						entity = ForgeRegistries.ENTITIES.getValue(rl);
+						entity = ForgeRegistries.ENTITY_TYPES.getValue(rl);
 					}else{
 						Ref.CustomQuests.LOGGER.warn("'Quest > " + parentQuestId + " > rewards > entries > " + parentRewardId + " > content > entity': Value is not a valid item, please use a valid item id, defaulting to 'minecraft:zombie_spawn_egg'!");
 						entity = EntityType.SHEEP;
@@ -169,9 +169,9 @@ public class SummonRewardType implements IRewardType{
 	@Override
 	public JsonObject getJson(){
 		JsonObject json = new JsonObject();
-		json.addProperty("entity", entity.getRegistryName().toString());
+		json.addProperty("entity", ForgeRegistries.ENTITY_TYPES.getKey(entity).toString());
 		json.addProperty("count", count);
-		json.addProperty("icon", icon.getRegistryName().toString());
+		json.addProperty("icon", ForgeRegistries.ITEMS.getKey(icon).toString());
 		return json;
 	}
 }

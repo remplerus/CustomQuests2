@@ -2,30 +2,38 @@ package com.vincentmet.customquests.network.messages.sync.stc.delete;
 
 import com.vincentmet.customquests.api.ClientUtils;
 import com.vincentmet.customquests.api.EditorClientProcessor;
+import com.vincentmet.customquests.network.messages.ICQPacket;
+import com.vincentmet.customquests.network.messages.sync.MessageUpdateSinglePlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class MessageStcSyncDeleteSingleQuest {
-    private final int questId;
+public class MessageStcSyncDeleteSingleQuest implements ICQPacket {
+    private int questId;
     
+    public MessageStcSyncDeleteSingleQuest(){}
+
     public MessageStcSyncDeleteSingleQuest(int questId){
         this.questId = questId;
     }
-    
-    public static void encode(MessageStcSyncDeleteSingleQuest packet, FriendlyByteBuf buffer){
+
+    @Override
+    public <T extends ICQPacket> void encode(T clazz, FriendlyByteBuf buffer) {
+        MessageStcSyncDeleteSingleQuest packet = (MessageStcSyncDeleteSingleQuest) clazz;
         buffer.writeInt(packet.questId);
     }
     
-    public static MessageStcSyncDeleteSingleQuest decode(FriendlyByteBuf buffer) {
+    public MessageStcSyncDeleteSingleQuest decode(FriendlyByteBuf buffer) {
         if(buffer.isReadable(4)){
             return new MessageStcSyncDeleteSingleQuest(buffer.readInt());
         }
         return null;
     }
-    
-    public static void handle(final MessageStcSyncDeleteSingleQuest message, Supplier<NetworkEvent.Context> ctx) {
+
+    @Override
+    public <T extends ICQPacket> void handle(T clazz, Supplier<NetworkEvent.Context> ctx) {
+        MessageStcSyncDeleteSingleQuest message = (MessageStcSyncDeleteSingleQuest) clazz;
         ctx.get().enqueueWork(() -> {
             if(message!=null){
                 EditorClientProcessor.Delete.deleteSingleQuest(message.questId);

@@ -12,13 +12,13 @@ import com.vincentmet.customquests.helpers.WorldHelper;
 import com.vincentmet.customquests.hierarchy.quest.ItemSlideshowTexture;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +26,9 @@ import java.util.function.Consumer;
 
 public class TravelTaskType implements ITaskType{
 	private static final ResourceLocation ID = new ResourceLocation(Ref.MODID, "travel");
-	private static final Component TRANSLATION_TASK_TITLE = new TranslatableComponent(Ref.MODID + ".standardcontent.tasks.travel");
-	private static final Component TRANSLATION_DIMENSION = new TranslatableComponent(Ref.MODID + ".general.dimension");
-	private static final Component TRANSLATION_POSITION = new TranslatableComponent(Ref.MODID + ".general.position");
+	private static final Component TRANSLATION_TASK_TITLE = Component.translatable(Ref.MODID + ".standardcontent.tasks.travel");
+	private static final Component TRANSLATION_DIMENSION = Component.translatable(Ref.MODID + ".general.dimension");
+	private static final Component TRANSLATION_POSITION = Component.translatable(Ref.MODID + ".general.position");
 	public static final List<PlayerBoundSubtaskReference> TRACKING_LIST = new ArrayList<>();
 	private int questId;
 	private int taskId;
@@ -40,7 +40,7 @@ public class TravelTaskType implements ITaskType{
 	private int z;
 	private int range;
 	
-	ItemSlideshowTexture icon = new ItemSlideshowTexture(Items.COMPASS.getRegistryName(), new ItemStack(Items.COMPASS));
+	ItemSlideshowTexture icon = new ItemSlideshowTexture(ForgeRegistries.ITEMS.getKey(Items.COMPASS), new ItemStack(Items.COMPASS));
 	
 	@Override
 	public ResourceLocation getId(){
@@ -159,19 +159,19 @@ public class TravelTaskType implements ITaskType{
 					dimension = ResourceLocation.tryParse(jsonPrimitiveStringValue);
 					if(dimension == null){
 						Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > dimension': Value is not a valid dimension, please use a valid dimension id, defaulting to 'minecraft:overworld'!");
-						dimension = DimensionType.OVERWORLD_LOCATION.location();
+						dimension = BuiltinDimensionTypes.OVERWORLD.location();
 					}
 				}else{
 					Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > dimension': Value is not a String, defaulting to 'minecraft:overworld'!");
-					dimension = DimensionType.OVERWORLD_LOCATION.location();
+					dimension = BuiltinDimensionTypes.OVERWORLD.location();
 				}
 			}else{
 				Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > dimension': Value is not a JsonPrimitive, please use a String, defaulting to 'minecraft:overworld'!");
-				dimension = DimensionType.OVERWORLD_LOCATION.location();
+				dimension = BuiltinDimensionTypes.OVERWORLD.location();
 			}
 		}else{
 			Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > dimension': Not detected, defaulting to 'minecraft:overworld'!");
-			dimension = DimensionType.OVERWORLD_LOCATION.location();
+			dimension = BuiltinDimensionTypes.OVERWORLD.location();
 		}
 	
 		if(json.has("x")){

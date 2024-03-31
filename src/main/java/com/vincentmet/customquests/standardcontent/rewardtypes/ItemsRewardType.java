@@ -17,6 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -108,23 +109,23 @@ public class ItemsRewardType implements IRewardType, IItemStacksProvider{
 					if(ogRL != null){
 						if(!TagHelper.Items.doesTagExist(ogRL) && !ForgeRegistries.ITEMS.containsKey(ogRL)){
 							Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > rewards > entries > " + rewardId + " > content > item': Value is not a valid item that exists in the game, please use a valid item, defaulting to 'minecraft:grass_block'!");
-							ogRL = Blocks.GRASS_BLOCK.getRegistryName();
+							ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
 						}
 					}else{
 						Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > rewards > entries > " + rewardId + " > content > item': Value is not a valid item ResourceLocation, defaulting to 'minecraft:grass_block'!");
-						ogRL = Blocks.GRASS_BLOCK.getRegistryName();
+						ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
 					}
 				}else{
 					Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > rewards > entries > " + rewardId + " > content > item': Value is not a String, defaulting to 'minecraft:grass_block'!");
-					ogRL = Blocks.GRASS_BLOCK.getRegistryName();
+					ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
 				}
 			}else{
 				Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > rewards > entries > " + rewardId + " > content > item': Value is not a JsonPrimitive, please use a String, defaulting to 'minecraft:grass_block'!");
-				ogRL = Blocks.GRASS_BLOCK.getRegistryName();
+				ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
 			}
 		}else{
 			Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > rewards > entries > " + rewardId + " > content > item': Not detected, defaulting to 'minecraft:grass_block'!");
-			ogRL = Blocks.GRASS_BLOCK.getRegistryName();
+			ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
 		}
 		
 		if(json.has("count")){

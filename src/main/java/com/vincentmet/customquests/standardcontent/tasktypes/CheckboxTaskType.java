@@ -16,7 +16,6 @@ import com.vincentmet.customquests.network.messages.PacketHandler;
 import com.vincentmet.customquests.standardcontent.messages.MessageCheckboxClick;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
@@ -26,8 +25,8 @@ import java.util.function.Consumer;
 
 public class CheckboxTaskType implements ITaskType{
 	private static final ResourceLocation ID = new ResourceLocation(Ref.MODID, "checkbox");
-	private static final Component TRANSLATION = new TranslatableComponent(Ref.MODID + ".standardcontent.tasks.checkbox");
-	private static final Component TRANSLATION_SUBTASK = new TranslatableComponent(Ref.MODID + ".standardcontent.tasks.checkbox.text_subtask");
+	private static final Component TRANSLATION = Component.translatable(Ref.MODID + ".standardcontent.tasks.checkbox");
+	private static final Component TRANSLATION_SUBTASK = Component.translatable(Ref.MODID + ".standardcontent.tasks.checkbox.text_subtask");
 	public static final List<PlayerBoundSubtaskReference> TRACKING_LIST = new ArrayList<>();
 	private int questId;
 	private int taskId;

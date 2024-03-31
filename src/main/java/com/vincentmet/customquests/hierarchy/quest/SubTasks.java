@@ -12,7 +12,7 @@ import com.vincentmet.customquests.gui.editor.EditorEntryWrapper;
 import com.vincentmet.customquests.gui.editor.IEditorEntry;
 import com.vincentmet.customquests.gui.editor.IEditorPage;
 import com.vincentmet.customquests.helpers.IntCounter;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Arrays;
@@ -127,7 +127,7 @@ public class SubTasks extends HashMap<Integer, SubTask> implements IJsonObjectPr
 
 	@Override
 	public void addPageEntries(List<IEditorEntry> list) {
-		list.add(new EditorEntryWrapper(new TextComponent("Logic"), new ResourceLocation(Ref.MODID, "plaintext"), () -> logicType.toString(), newValueObject -> {
+		list.add(new EditorEntryWrapper(Component.literal("Logic"), new ResourceLocation(Ref.MODID, "plaintext"), () -> logicType.toString(), newValueObject -> {
 			if (Arrays.stream(LogicType.values()).anyMatch(logicType1 -> logicType1.toString().equals(newValueObject.toString().toUpperCase()))){
 				setLogicType(LogicType.valueOf(newValueObject.toString().toUpperCase()));
 			}else{

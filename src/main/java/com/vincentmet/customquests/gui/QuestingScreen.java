@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.vincentmet.customquests.Ref;
 import com.vincentmet.customquests.api.ChapterHelper;
 import com.vincentmet.customquests.api.QuestingStorage;
-import com.vincentmet.customquests.api.TextUtils;
 import com.vincentmet.customquests.gui.editor.ActionQueue;
 import com.vincentmet.customquests.gui.elements.ButtonState;
 import com.vincentmet.customquests.gui.elements.ChapterButton;
@@ -22,8 +21,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -44,7 +41,7 @@ public class QuestingScreen extends Screen {
 	private QuestingCanvas questingCanvas;
 	public QuestDetails questDetails;
 	private final Player localPlayer = Minecraft.getInstance().player;
-	private BooleanContainer queueReInit = new BooleanContainer(true);
+	private final BooleanContainer queueReInit = new BooleanContainer(true);
 	
 	private final IntSupplier questingCanvasX = ()->(width>>2) + 10;
 	private final IntSupplier questingCanvasY = ()->20;
@@ -66,13 +63,13 @@ public class QuestingScreen extends Screen {
 	private final IntSupplier questDetailsWidth = ()->width-40;
 	private final IntSupplier questDetailsHeight = ()->height-40;
 	
-	private static final Component localization_noQuests = new TranslatableComponent(Ref.MODID + ".screens.no_quests");
-	private static final Component localization_backToChapters = new TranslatableComponent(Ref.MODID + ".screens.back_to_chapters");
+	private static final Component localization_noQuests = Component.translatable(Ref.MODID + ".screens.no_quests");
+	private static final Component localization_backToChapters = Component.translatable(Ref.MODID + ".screens.back_to_chapters");
 	
 	private final List<Component> tooltip_backToChapters = new ArrayList<>();
 	
 	public QuestingScreen(OptionalInt questId){
-		super(new TranslatableComponent("item." + Ref.MODID + ".questing_device"));
+		super(Component.translatable("item." + Ref.MODID + ".questing_device"));
 		if(questId.isPresent()){
 			screenManager.setCurrentlySelectedQuestId(questId.getAsInt());
 		}
@@ -103,8 +100,8 @@ public class QuestingScreen extends Screen {
 		chapterList.clear();
 		QuestingStorage.getSidedChaptersMap().forEach((chapterID, chapter) -> {
 			List<Component> chapterInfoList = new ArrayList<>();
-			chapterInfoList.add(new TextComponent(chapter.getTitle().getStyledText() + ChatFormatting.RESET + " #" + chapterID));
-			chapterInfoList.add(new TextComponent(chapter.getText().getStyledText()));
+			chapterInfoList.add(Component.literal(chapter.getTitle().getStyledText() + ChatFormatting.RESET + " #" + chapterID));
+			chapterInfoList.add(Component.literal(chapter.getText().getStyledText()));
 			
 			ButtonState buttonState = ButtonState.DISABLED;
 			if(ChapterHelper.isChapterUnlocked(localPlayer.getUUID(), chapter)){

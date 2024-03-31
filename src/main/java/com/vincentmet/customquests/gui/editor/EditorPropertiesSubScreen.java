@@ -14,7 +14,7 @@ import com.vincentmet.customquests.helpers.IntCounter;
 import com.vincentmet.customquests.helpers.math.Vec2i;
 import com.vincentmet.customquests.helpers.rendering.VariableButton;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ public class EditorPropertiesSubScreen implements IHoverRenderable, CQGuiEventLi
     private VariableButton removeQuestButton;
     private VariableButton removeTaskButton;
 
-    private static final TranslatableComponent TRANSLATION_USE_SUBMENU = new TranslatableComponent(Ref.MODID + ".editor.use_submenu");
+    private static final Component TRANSLATION_USE_SUBMENU = Component.translatable(Ref.MODID + ".editor.use_submenu");
     
     public EditorPropertiesSubScreen(EditorScreen parent, EditorScreenManager screenManager, IntSupplier x, IntSupplier y, IntSupplier width, IntSupplier height){
         this.parent = parent;

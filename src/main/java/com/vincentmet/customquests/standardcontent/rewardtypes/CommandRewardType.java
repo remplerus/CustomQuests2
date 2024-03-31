@@ -10,7 +10,7 @@ import com.vincentmet.customquests.Ref;
 import com.vincentmet.customquests.api.IRewardType;
 import com.vincentmet.customquests.helpers.MouseButton;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -123,15 +123,15 @@ public class CommandRewardType implements IRewardType{
 					displayText =  jsonPrimitive.getAsString();
 				}else{
 					Ref.CustomQuests.LOGGER.warn("'Quest > " + parentQuestId + " > rewards > entries > " + parentRewardId + " > content > text': Value is not a String, defaulting to 'Hidden'!");
-					displayText = new TranslatableComponent(Ref.MODID + ".general.hidden").getString();
+					displayText = Component.translatable(Ref.MODID + ".general.hidden").getString();
 				}
 			}else{
 				Ref.CustomQuests.LOGGER.warn("'Quest > " + parentQuestId + " > rewards > entries > " + parentRewardId + " > content > text': Value is not a JsonPrimitive, please use a String, defaulting to 'Hidden'!");
-				displayText = new TranslatableComponent(Ref.MODID + ".general.hidden").getString();
+				displayText = Component.translatable(Ref.MODID + ".general.hidden").getString();
 			}
 		}else{
 			Ref.CustomQuests.LOGGER.warn("'Quest > " + parentQuestId + " > rewards > entries > " + parentRewardId + " > content > text': Not detected, defaulting to 'Hidden'!");
-			displayText = new TranslatableComponent(Ref.MODID + ".general.hidden").getString();
+			displayText = Component.translatable(Ref.MODID + ".general.hidden").getString();
 		}
 		
 		if(json.has("command")){
@@ -159,7 +159,7 @@ public class CommandRewardType implements IRewardType{
 		JsonObject json = new JsonObject();
 		json.addProperty("command", command);
 		json.addProperty("text", displayText);
-		json.addProperty("icon", icon.getRegistryName().toString());
+		json.addProperty("icon", ForgeRegistries.ITEMS.getKey(icon).toString());
 		return json;
 	}
 }

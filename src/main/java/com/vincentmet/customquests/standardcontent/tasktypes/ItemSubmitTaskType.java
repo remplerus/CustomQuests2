@@ -9,18 +9,17 @@ import com.vincentmet.customquests.api.*;
 import com.vincentmet.customquests.helpers.*;
 import com.vincentmet.customquests.hierarchy.quest.ItemSlideshowTexture;
 import com.vincentmet.customquests.integrations.jei.JEIHelper;
-import com.vincentmet.customquests.network.messages.button.MessageTaskButton;
 import com.vincentmet.customquests.network.messages.PacketHandler;
+import com.vincentmet.customquests.network.messages.button.MessageTaskButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,7 +31,7 @@ import java.util.function.Consumer;
 
 public class ItemSubmitTaskType implements ITaskType, IItemStacksProvider{
 	private static final ResourceLocation ID = new ResourceLocation(Ref.MODID, "item_submit");
-	private static final Component TRANSLATION = new TranslatableComponent(Ref.MODID + ".standardcontent.tasks.item_submit");
+	private static final Component TRANSLATION = Component.translatable(Ref.MODID + ".standardcontent.tasks.item_submit");
 	public static final List<PlayerBoundSubtaskReference> TRACKING_LIST = new ArrayList<>();
 	
 	private int questId;
@@ -128,23 +127,23 @@ public class ItemSubmitTaskType implements ITaskType, IItemStacksProvider{
 					if(ogRL != null){
 						if(!TagHelper.Items.doesTagExist(ogRL) && !ForgeRegistries.ITEMS.containsKey(ogRL)){
 							Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > item': Value is not a valid item that exists in the game, please use a valid item, defaulting to 'minecraft:grass_block'!");
-							ogRL = Blocks.GRASS_BLOCK.getRegistryName();
+							ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
 						}
 					}else{
 						Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > item': Value is not a valid item ResourceLocation, defaulting to 'minecraft:grass_block'!");
-						ogRL = Blocks.GRASS_BLOCK.getRegistryName();
+						ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
 					}
 				}else{
 					Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > item': Value is not a String, defaulting to 'minecraft:grass_block'!");
-					ogRL = Blocks.GRASS_BLOCK.getRegistryName();
+					ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
 				}
 			}else{
 				Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > item': Value is not a JsonPrimitive, please use a String, defaulting to 'minecraft:grass_block'!");
-				ogRL = Blocks.GRASS_BLOCK.getRegistryName();
+				ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
 			}
 		}else{
 			Ref.CustomQuests.LOGGER.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > item': Not detected, defaulting to 'minecraft:grass_block'!");
-			ogRL = Blocks.GRASS_BLOCK.getRegistryName();
+			ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
 		}
 	
 		if(json.has("count")){
@@ -225,7 +224,7 @@ public class ItemSubmitTaskType implements ITaskType, IItemStacksProvider{
     
     @Override
 	public boolean hasButton(ButtonContext context){
-		context.setText(new TranslatableComponent(Ref.MODID  + ".standardcontent.tasks.button.item_submit"));
+		context.setText(Component.translatable(Ref.MODID  + ".standardcontent.tasks.button.item_submit"));
 		context.setOnClick((mouseButton, uuid, questId, taskId) -> {
 			if(!CombinedProgressHelper.isTaskCompleted(uuid, questId, taskId)){
 				PacketHandler.CHANNEL.sendToServer(new MessageTaskButton(questId, taskId));
@@ -297,7 +296,7 @@ public class ItemSubmitTaskType implements ITaskType, IItemStacksProvider{
 		if(items.size()==1){
 			return count + "x " + items.get(0).getItem().getDescription().getString();
 		}else{
-			return count + "x " + new TranslatableComponent(Ref.MODID + ".general.tag").getString() + ": " + Arrays.stream(ogRL.getPath().split("/")).map(StringUtils::capitalize).reduce((s, s2) ->s + "/" + s2).orElse(new TranslatableComponent(Ref.MODID + ".general.tag.empty").getString());
+			return count + "x " + Component.translatable(Ref.MODID + ".general.tag").getString() + ": " + Arrays.stream(ogRL.getPath().split("/")).map(StringUtils::capitalize).reduce((s, s2) ->s + "/" + s2).orElse(Component.translatable(Ref.MODID + ".general.tag.empty").getString());
 		}
 	}
 	

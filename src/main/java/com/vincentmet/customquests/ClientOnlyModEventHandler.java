@@ -1,0 +1,15 @@
+package com.vincentmet.customquests;
+
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+
+@Mod.EventBusSubscriber(modid = Ref.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+public class ClientOnlyModEventHandler {
+    @SubscribeEvent
+    public static void registerItem(RegisterKeyMappingsEvent event){
+        //Main
+        event.register(Objects.KeyBinds.OPEN_QUESTING_SCREEN);
+        event.register(Objects.KeyBinds.CLAIM_ALL_REWARDS);
+    }
+}

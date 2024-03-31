@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.vincentmet.customquests.api.*;
 import com.vincentmet.customquests.hierarchy.progress.SingleQuestUserProgress;
+import com.vincentmet.customquests.network.messages.ICQPacket;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -12,10 +13,12 @@ import java.util.function.Supplier;
 
 import static com.vincentmet.customquests.Ref.CustomQuests.LOGGER;
 
-public class MessageUpdateSinglePlayerQuestProgress{
-	public final UUID uuid;
-	public final int questId;
+public class MessageUpdateSinglePlayerQuestProgress implements ICQPacket {
+	public UUID uuid;
+	public int questId;
 	public JsonObject jsonObject;
+
+	public MessageUpdateSinglePlayerQuestProgress(){}
 
 	private MessageUpdateSinglePlayerQuestProgress(UUID uuid, int questId, JsonObject json){
 		this.uuid = uuid;
@@ -33,7 +36,9 @@ public class MessageUpdateSinglePlayerQuestProgress{
 		}
 	}
 
-	public static void encode(MessageUpdateSinglePlayerQuestProgress packet, FriendlyByteBuf buffer){
+	@Override
+	public <T extends ICQPacket> void encode(T clazz, FriendlyByteBuf buffer) {
+		MessageUpdateSinglePlayerQuestProgress packet = (MessageUpdateSinglePlayerQuestProgress) clazz;
 		if(ProgressHelper.doesPlayerExist(packet.uuid) && QuestHelper.doesQuestExist(packet.questId) && packet.jsonObject != null){
 			buffer.writeUUID(packet.uuid);
 			buffer.writeInt(packet.questId);
@@ -41,14 +46,16 @@ public class MessageUpdateSinglePlayerQuestProgress{
 		}
 	}
 	
-	public static MessageUpdateSinglePlayerQuestProgress decode(FriendlyByteBuf buffer) {
+	public MessageUpdateSinglePlayerQuestProgress decode(FriendlyByteBuf buffer) {
 		if(buffer.isReadable(22)){//16 for uuid, 4 for int, 2+ for json
 			return new MessageUpdateSinglePlayerQuestProgress(buffer.readUUID(), buffer.readInt(), JsonParser.parseString(buffer.readUtf()).getAsJsonObject());
 		}
 		return null;
 	}
-	
-	public static void handle(final MessageUpdateSinglePlayerQuestProgress message, Supplier<NetworkEvent.Context> ctx) {
+
+	@Override
+	public <T extends ICQPacket> void handle(T clazz, Supplier<NetworkEvent.Context> ctx) {
+		MessageUpdateSinglePlayerQuestProgress message = (MessageUpdateSinglePlayerQuestProgress) clazz;
 		ctx.get().enqueueWork(() -> {
 			if(message!=null){
 				EditorClientProcessor.Update.Players.Progress.updateSingleQuestingPlayer(message.uuid, message.questId, message.jsonObject);

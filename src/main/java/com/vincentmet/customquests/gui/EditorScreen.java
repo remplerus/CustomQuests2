@@ -14,7 +14,7 @@ import com.vincentmet.customquests.helpers.rendering.VariableButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.glfw.GLFW;
@@ -65,7 +65,7 @@ public class EditorScreen extends Screen {
 
     //todo quest, task subtask, reward and subreward button (+logic)
     public EditorScreen(){
-        super(new TranslatableComponent(Ref.MODID + ".screens.editor"));
+        super(Component.translatable(Ref.MODID + ".screens.editor"));
     }
 
     @Override

@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
@@ -37,11 +36,11 @@ public class DeliveryBlockTileEntity extends BlockEntity {
 	@Nonnull
 	@Override
 	public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side){
-		if(side == Direction.UP){
+		/*if(side == Direction.UP){
 			if(cap.equals(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
 				if(currentSubmitter!=null)return handler.cast();
 			}
-		}
+		}*/
 		return super.getCapability(cap, side);
 	}
 	

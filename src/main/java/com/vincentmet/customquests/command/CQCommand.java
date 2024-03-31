@@ -14,7 +14,6 @@ import com.vincentmet.customquests.Ref;
 import com.vincentmet.customquests.api.*;
 import com.vincentmet.customquests.event.DataLoadingEvent;
 import com.vincentmet.customquests.helpers.PartyInviteCache;
-import com.vincentmet.customquests.hierarchy.party.Party;
 import com.vincentmet.customquests.network.messages.PacketHandler;
 import com.vincentmet.customquests.network.messages.command.MessageDiscord;
 import com.vincentmet.customquests.network.messages.command.MessageHand;
@@ -23,8 +22,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -34,8 +32,6 @@ import net.minecraftforge.fml.util.thread.EffectiveSide;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.network.PacketDistributor;
 
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -56,7 +52,7 @@ public class CQCommand{
                 .then(registerDiscordCommand())
                 .then(registerUuidCommand())
                 .executes(context->{
-                        context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.use_subcommand"));
+                        context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.use_subcommand"));
                         return 0;
                 })
         );
@@ -68,9 +64,9 @@ public class CQCommand{
                 .then(Commands.literal("list")
                     .executes(context -> {
                         if(QuestingStorage.getSidedPartiesMap().size()>=1){
-                            QuestingStorage.getSidedPartiesMap().values().forEach(party->context.getSource().sendSuccess(new TextComponent("ID: " + party.getId() + ", " + new TranslatableComponent(Ref.MODID + ".general.name").getString() + ": " + party.getName()), false));
+                            QuestingStorage.getSidedPartiesMap().values().forEach(party->context.getSource().sendSuccess(Component.literal("ID: " + party.getId() + ", " + Component.translatable(Ref.MODID + ".general.name").getString() + ": " + party.getName()), false));
                         }else{
-                            context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.list.no_parties"));
+                            context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.list.no_parties"));
                         }
                         return 0;
                     })
@@ -82,20 +78,20 @@ public class CQCommand{
                             if(Pattern.matches("[A-Za-z0-9]+?", name)){
                                 int partyId = PartyHelper.createParty(context.getSource().getPlayerOrException().getUUID(), name);
                                 if(partyId == Ref.NO_PARTY){
-                                    context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.create.error"));
+                                    context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.create.error"));
                                 }else{
                                     String devModeMessage = Config.SidedConfig.isDebugModeOn() ? " (ID: "+partyId+", name:'" + name + "')" : "";
-                                    context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.party.create.success", devModeMessage), false);
+                                    context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.party.create.success", devModeMessage), false);
                                     context.getSource().getServer().getPlayerList().getPlayers().forEach(ServerUtils.Packets.SyncToClient.Progress::syncAllProgressAndPartiesToPlayer);
                                 }
                             }else{
-                                context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.create.invalid_name"));
+                                context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.create.invalid_name"));
                             }
                             return 0;
                         })
                     )
                     .executes(context -> {
-                        context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.create.no_name"));
+                        context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.create.no_name"));
                         return 0;
                     })
                 )
@@ -105,21 +101,21 @@ public class CQCommand{
                         int playerParty = ProgressHelper.getPlayerParty(uuid);
                         List<UUID> uuidsInParty = PartyHelper.getAllUUIDsInParty(playerParty);
                         if(playerParty == Ref.NO_PARTY){
-                            context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.leave.not_in_party"));
+                            context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.leave.not_in_party"));
                             return 0;
                         }
                         if(PartyHelper.isPlayerPartyOwner(uuid, playerParty) && uuidsInParty.size() > 1){
-                            context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.leave.party_owner"));
+                            context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.leave.party_owner"));
                             return 0;
                         }
                         if(uuidsInParty.size() == 1){ //If player is last one in party
                             ProgressHelper.setPlayerParty(uuid, Ref.NO_PARTY);
                             PartyHelper.deleteParty(playerParty);
-                            context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.party.delete.success"), false);
+                            context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.party.delete.success"), false);
                             return 0;
                         }
                         ProgressHelper.setPlayerParty(uuid, Ref.NO_PARTY);
-                        context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.party.leave.success"), false);
+                        context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.party.leave.success"), false);
                         return 0;
                     })
                 )
@@ -130,22 +126,22 @@ public class CQCommand{
                             int playerParty = ProgressHelper.getPlayerParty(uuid);
                             Player newOwner = EntityArgument.getPlayer(context, "new_owner");
                             if(!ProgressHelper.isPlayerInParty(uuid)){
-                                context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.set_owner.not_in_party"));
+                                context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.set_owner.not_in_party"));
                             }else if(newOwner.getUUID().equals(uuid)){
-                                context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.set_owner.already_owner"));
+                                context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.set_owner.already_owner"));
                             }else if(PartyHelper.isPlayerPartyOwner(uuid, playerParty) && ProgressHelper.getPlayerParty(newOwner.getUUID()) == playerParty){
                                 PartyHelper.setPartyOwner(newOwner.getUUID(), playerParty);
-                                context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.party.set_owner.success", newOwner.getDisplayName().getString()), false);
+                                context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.party.set_owner.success", newOwner.getDisplayName().getString()), false);
                             }else if(ProgressHelper.getPlayerParty(newOwner.getUUID()) == playerParty){
-                                context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.set_owner.not_owner"));
+                                context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.set_owner.not_owner"));
                             }else{
-                                context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.set_owner.new_owner_not_in_party"));
+                                context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.set_owner.new_owner_not_in_party"));
                             }
                             return 0;
                         })
                     )
                     .executes(context -> {
-                        context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.set_owner.no_name"));
+                        context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.set_owner.no_name"));
                         return 0;
                     })
                 )
@@ -159,22 +155,22 @@ public class CQCommand{
                              if(ProgressHelper.doesPlayerExist(inviterUUID) && ProgressHelper.isPlayerInParty(inviterUUID)){
                                  int partyId = ProgressHelper.getPlayerParty(inviterUUID);
                                  if(invitedPlayerUUID.equals(inviterUUID)){
-                                     context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.invite.yourself"));
+                                     context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.invite.yourself"));
                                  }else if(PartyInviteCache.isPlayerInvitedToAnyParty(invitedPlayerUUID)){
-                                     context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.invite.player_already_pending"));
+                                     context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.invite.player_already_pending"));
                                  }else if(!PartyHelper.isPlayerPartyOwner(inviterUUID, partyId)){
-                                     context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.invite.not_owner"));
+                                     context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.invite.not_owner"));
                                  }else{
                                      PartyInviteCache.addInvite(invitedPlayerUUID, partyId);
-                                     context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.party.invite.success.feedback", invitedPlayer.getDisplayName().getString()), false);
-                                     invitedPlayer.sendMessage(new TranslatableComponent(Ref.MODID + ".command.party.invite.success.invited_player_message", inviter.getDisplayName().getString()), inviterUUID);
+                                     context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.party.invite.success.feedback", invitedPlayer.getDisplayName().getString()), false);
+                                     invitedPlayer.sendSystemMessage(Component.translatable(Ref.MODID + ".command.party.invite.success.invited_player_message", inviter.getDisplayName().getString()));
                                  }
                              }
                              return 0;
                          })
                      )
                      .executes(context -> {
-                         context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.invite.no_name"));
+                         context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.invite.no_name"));
                          return 0;
                      })
                 )
@@ -182,13 +178,13 @@ public class CQCommand{
                     .executes(context -> {
                         UUID accepter = context.getSource().getPlayerOrException().getUUID();
                         if(ProgressHelper.isPlayerInParty(accepter)){
-                            context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.accept.in_party"));
+                            context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.accept.in_party"));
                         }else if(!PartyInviteCache.isPlayerInvitedToAnyParty(accepter)){
-                            context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.accept.not_invited"));
+                            context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.accept.not_invited"));
                         }else{
                             int newPartyId = PartyInviteCache.getPartyForInvite(accepter);
                             ProgressHelper.setPlayerParty(accepter, newPartyId);
-                            context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.party.accept.success"), false);
+                            context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.party.accept.success"), false);
                         }
                         return 0;
                     })
@@ -197,18 +193,18 @@ public class CQCommand{
                     .executes(context -> {
                         UUID denier = context.getSource().getPlayerOrException().getUUID();
                         if(ProgressHelper.isPlayerInParty(denier)){
-                            context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.deny.in_party"));
+                            context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.deny.in_party"));
                         }else if(PartyInviteCache.isPlayerInvitedToAnyParty(denier)){
-                            context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party.deny.not_invited"));
+                            context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party.deny.not_invited"));
                         }else{
                             PartyInviteCache.removePlayerInvite(denier);
-                            context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.party.deny.success"), false);
+                            context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.party.deny.success"), false);
                         }
                         return 0;
                     })
                 )
                 .executes(context->{
-                    context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.use_subcommand"));
+                    context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.use_subcommand"));
                     return 0;
                 })
         ;
@@ -297,7 +293,7 @@ public class CQCommand{
                                                                     PartyHelper.completeQuest(partyId, questId);
                                                                 });
                                                             }else{
-                                                                context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.party_doesnt_exist"));
+                                                                context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.party_doesnt_exist"));
                                                             }
                                                             return 0;
                                                         })
@@ -432,7 +428,7 @@ public class CQCommand{
                                     QuestingStorage.getSidedPartiesMap().forEach((partyId, party) -> PartyHelper.deleteProgress(partyId));
                                     //todo, all above is working final and has the right values, so the reward claim error lays below
                                     context.getSource().getServer().getPlayerList().getPlayers().forEach(ServerUtils.Packets.SyncToClient.Progress::syncAllProgressAndPartiesToPlayer);
-                                    context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.progress.delete.all.success"), false);
+                                    context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.progress.delete.all.success"), false);
                                     return 0;
                                 })
                         )
@@ -443,7 +439,7 @@ public class CQCommand{
                                     serverPlayerEntities.forEach(playerEntity -> {
                                         ProgressHelper.deleteProgress(playerEntity.getUUID());
                                         context.getSource().getServer().getPlayerList().getPlayers().forEach(ServerUtils.Packets.SyncToClient.Progress.Players::syncAllPlayerProgressToPlayer);
-                                        context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.progress.delete.player.success", playerEntity.getDisplayName()), false);
+                                        context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.progress.delete.player.success", playerEntity.getDisplayName()), false);
                                     });
                                     return 0;
                                 })
@@ -456,9 +452,9 @@ public class CQCommand{
                                     if(PartyHelper.doesPartyExist(partyId)){
                                         PartyHelper.deleteProgress(partyId);
                                         context.getSource().getServer().getPlayerList().getPlayers().forEach(ServerUtils.Packets.SyncToClient.Progress.Parties::syncAllPartiesToPlayer);
-                                        context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.progress.delete.party.success", partyId, PartyHelper.getPartyName(partyId)), false);
+                                        context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.progress.delete.party.success", partyId, PartyHelper.getPartyName(partyId)), false);
                                     }else{
-                                        context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.progress.delete.party.failed", partyId));
+                                        context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.progress.delete.party.failed", partyId));
                                         
                                     }
                                     return 0;
@@ -466,12 +462,12 @@ public class CQCommand{
                             )
                         )
                         .executes(context -> {
-                            context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.use_subcommand"));
+                            context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.use_subcommand"));
                             return 0;
                         })
                 )
                 .executes(context->{
-                    context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.wip"));
+                    context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.wip"));
                     return 0;
                 })
         ;
@@ -498,7 +494,7 @@ public class CQCommand{
                             ServerPlayer player = context.getSource().getPlayerOrException();
                             PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(()->player), new MessageOpenEditor());
                         }else{
-                            context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.open_editor.not_enabled"));
+                            context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.open_editor.not_enabled"));
                         }
                     }catch(CommandSyntaxException ignored){}
                     return 0;
@@ -518,13 +514,13 @@ public class CQCommand{
                      .then(Commands.argument("value", BoolArgumentType.bool())
                            .executes(context -> {
                                Config.ServerConfig.CAN_REWARD_ONLY_BE_CLAIMED_ONCE = BoolArgumentType.getBool(context, "value");
-                               context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.settings.set", "can_reward_only_be_claimed_once", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.canRewardOnlyBeClaimedOnce())), false);
+                               context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.settings.set", "can_reward_only_be_claimed_once", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.canRewardOnlyBeClaimedOnce())), false);
                                ServerUtils.Packets.SyncToClient.Config.syncConfigToAllPlayers();
                                return 0;
                            })
                      )
                      .executes(context -> {
-                         context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.settings.get", "can_reward_only_be_claimed_once", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.canRewardOnlyBeClaimedOnce())), false);
+                         context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.settings.get", "can_reward_only_be_claimed_once", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.canRewardOnlyBeClaimedOnce())), false);
                          return 0;
                      })
                 )
@@ -532,13 +528,13 @@ public class CQCommand{
                      .then(Commands.argument("value", BoolArgumentType.bool())
                            .executes(context -> {
                                Config.ServerConfig.EDIT_MODE = BoolArgumentType.getBool(context, "value");
-                               context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.settings.set", "edit_mode", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.isEditModeOn())), false);
+                               context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.settings.set", "edit_mode", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.isEditModeOn())), false);
                                ServerUtils.Packets.SyncToClient.Config.syncConfigToAllPlayers();
                                return 0;
                            })
                      )
                      .executes(context -> {
-                         context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.settings.get", "edit_mode", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.isEditModeOn())), false);
+                         context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.settings.get", "edit_mode", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.isEditModeOn())), false);
                          return 0;
                      })
                 )*/
@@ -546,13 +542,13 @@ public class CQCommand{
                      .then(Commands.argument("value", BoolArgumentType.bool())
                            .executes(context -> {
                                Config.ServerConfig.GIVE_DEVICE_ON_FIRST_LOGIN = BoolArgumentType.getBool(context, "value");
-                               context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.settings.set", "give_device_on_first_login", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.giveDeviceOnFirstLogin())), false);
+                               context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.settings.set", "give_device_on_first_login", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.giveDeviceOnFirstLogin())), false);
                                ServerUtils.Packets.SyncToClient.Config.syncConfigToAllPlayers();
                                return 0;
                            })
                      )
                      .executes(context -> {
-                         context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.settings.get", "give_device_on_first_login", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.giveDeviceOnFirstLogin())), false);
+                         context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.settings.get", "give_device_on_first_login", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.giveDeviceOnFirstLogin())), false);
                          return 0;
                      })
                 )
@@ -560,13 +556,13 @@ public class CQCommand{
                      .then(Commands.argument("value", BoolArgumentType.bool())
                            .executes(context -> {
                                Config.ServerConfig.DEBUG_MODE = BoolArgumentType.getBool(context, "value");
-                               context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.settings.set", "debug_mode", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.isDebugModeOn())), false);
+                               context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.settings.set", "debug_mode", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.isDebugModeOn())), false);
                                ServerUtils.Packets.SyncToClient.Config.syncConfigToAllPlayers();
                                return 0;
                            })
                      )
                      .executes(context -> {
-                         context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.settings.get", "debug_mode", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.isDebugModeOn())), false);
+                         context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.settings.get", "debug_mode", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.isDebugModeOn())), false);
                          return 0;
                      })
                 )
@@ -574,18 +570,18 @@ public class CQCommand{
                      .then(Commands.argument("value", BoolArgumentType.bool())
                            .executes(context -> {
                                Config.ServerConfig.GIVE_DEVICE_ON_FIRST_LOGIN = BoolArgumentType.getBool(context, "value");
-                               context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.settings.set", "backups", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.areBackupsEnabled())), false);
+                               context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.settings.set", "backups", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.areBackupsEnabled())), false);
                                ServerUtils.Packets.SyncToClient.Config.syncConfigToAllPlayers();
                                return 0;
                            })
                      )
                      .executes(context -> {
-                         context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.settings.get", "backups", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.areBackupsEnabled())), false);
+                         context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.settings.get", "backups", ChatFormatting.GOLD + String.valueOf(Config.SidedConfig.areBackupsEnabled())), false);
                          return 0;
                      })
                 )
                 .executes(context->{
-                    context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.use_subcommand"));
+                    context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.use_subcommand"));
                     return 0;
                 })
         ;
@@ -594,9 +590,9 @@ public class CQCommand{
     public static ArgumentBuilder<CommandSourceStack, ?> registerInfoCommand(){
         return Commands.literal("info")
                 .executes(context->{
-                    context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.info.modid", Ref.MODID), false);
-                    context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.info.mod_version", Ref.VERSION_MOD), false);
-                    context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.info.mc_version", Ref.VERSION_MC), false);
+                    context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.info.modid", Ref.MODID), false);
+                    context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.info.mod_version", Ref.VERSION_MOD), false);
+                    context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.info.mc_version", Ref.VERSION_MC), false);
                     return 0;
                 })
         ;
@@ -620,7 +616,7 @@ public class CQCommand{
                         ServerUtils.Packets.SyncToClient.Data.syncAllChaptersAndQuestsToPlayer(playerEntity);
                         ServerUtils.Packets.SyncToClient.Progress.syncAllProgressAndPartiesToPlayer(playerEntity);
                     });
-                    context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.reload.success"), false);
+                    context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.reload.success"), false);
                     return 0;
                 })
         ;
@@ -629,7 +625,7 @@ public class CQCommand{
     public static ArgumentBuilder<CommandSourceStack, ?> registerQuestsCommand(){
         return Commands.literal("quests")//modify default quests /// remove, add, dupe, edit, stuff like that
                 .executes(context->{
-                    context.getSource().sendFailure(new TranslatableComponent(Ref.MODID + ".command.wip"));
+                    context.getSource().sendFailure(Component.translatable(Ref.MODID + ".command.wip"));
                     return 0;
                 })
         ;
@@ -638,7 +634,7 @@ public class CQCommand{
     public static ArgumentBuilder<CommandSourceStack, ?> registerUuidCommand(){
         return Commands.literal("uuid")
                 .executes(context->{
-                    context.getSource().sendSuccess(new TranslatableComponent(Ref.MODID + ".command.uuid", context.getSource().getPlayerOrException().getStringUUID()), false);
+                    context.getSource().sendSuccess(Component.translatable(Ref.MODID + ".command.uuid", context.getSource().getPlayerOrException().getStringUUID()), false);
                     return 0;
                 })
         ;
@@ -650,7 +646,7 @@ public class CQCommand{
                     ItemStack stack = context.getSource().getPlayerOrException().getItemInHand(InteractionHand.MAIN_HAND);
                     ServerPlayer player = context.getSource().getPlayerOrException();
                     PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new MessageHand(stack));
-                    context.getSource().getPlayerOrException().displayClientMessage(new TextComponent("Itemstack JSON copied to clipboard!"), false);
+                    context.getSource().getPlayerOrException().displayClientMessage(Component.literal("Itemstack JSON copied to clipboard!"), false);
                     return 0;
                 })
         ;

@@ -3,16 +3,20 @@ package com.vincentmet.customquests.network.messages.sync.stc.update;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.network.messages.ICQPacket;
+import com.vincentmet.customquests.network.messages.sync.MessageUpdateSinglePlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class MessageStcSyncUpdateSingleSubtask {
-	private final int questId;
-	private final int taskId;
-	private final int subtaskId;
+public class MessageStcSyncUpdateSingleSubtask implements ICQPacket {
+	private int questId;
+	private int taskId;
+	private int subtaskId;
 	private JsonObject jsonObject;
+
+	public MessageStcSyncUpdateSingleSubtask(){}
 
 	private MessageStcSyncUpdateSingleSubtask(int questId, int taskId, int subtaskId, JsonObject jsonObject){
 		this.questId = questId;
@@ -32,7 +36,9 @@ public class MessageStcSyncUpdateSingleSubtask {
 		}
 	}
 
-	public static void encode(MessageStcSyncUpdateSingleSubtask packet, FriendlyByteBuf buffer){
+	@Override
+	public <T extends ICQPacket> void encode(T clazz, FriendlyByteBuf buffer) {
+		MessageStcSyncUpdateSingleSubtask packet = (MessageStcSyncUpdateSingleSubtask) clazz;
 		if(QuestHelper.doesSubtaskExist(packet.questId, packet.taskId, packet.subtaskId) && packet.jsonObject != null){
 			buffer.writeInt(packet.questId);
 			buffer.writeInt(packet.taskId);
@@ -41,14 +47,16 @@ public class MessageStcSyncUpdateSingleSubtask {
 		}
 	}
 	
-	public static MessageStcSyncUpdateSingleSubtask decode(FriendlyByteBuf buffer) {
+	public MessageStcSyncUpdateSingleSubtask decode(FriendlyByteBuf buffer) {
 		if(buffer.isReadable(14)){//4 for int, 4 for int, 4 for int, 2+ for json
 			return new MessageStcSyncUpdateSingleSubtask(buffer.readInt(), buffer.readInt(), buffer.readInt(), JsonParser.parseString(buffer.readUtf()).getAsJsonObject());
 		}
 		return null;
 	}
-	
-	public static void handle(final MessageStcSyncUpdateSingleSubtask message, Supplier<NetworkEvent.Context> ctx) {
+
+	@Override
+	public <T extends ICQPacket> void handle(T clazz, Supplier<NetworkEvent.Context> ctx) {
+		MessageStcSyncUpdateSingleSubtask message = (MessageStcSyncUpdateSingleSubtask) clazz;
 		ctx.get().enqueueWork(() -> {
 			if(message!=null){
 				EditorClientProcessor.Update.Quests.updateSingleSubtask(message.questId, message.taskId, message.subtaskId, message.jsonObject);

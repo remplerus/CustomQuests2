@@ -3,12 +3,11 @@ package com.vincentmet.customquests.api;
 import com.vincentmet.customquests.helpers.MouseButton;
 import com.vincentmet.customquests.helpers.QuadConsumer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 
 import java.util.UUID;
 
 public class ButtonContext{
-	private Component text = new TextComponent("uwu");
+	private Component text = Component.literal("uwu");
 	private QuadConsumer<MouseButton, UUID, Integer, Integer> onClick = (mouseButton, uuid, questId, taskId)->{};
 	
 	public Component getText(){

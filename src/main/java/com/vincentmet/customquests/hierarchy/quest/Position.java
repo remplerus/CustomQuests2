@@ -1,14 +1,17 @@
 package com.vincentmet.customquests.hierarchy.quest;
 
-import com.google.gson.*;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.vincentmet.customquests.Ref;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.EditorGuiHelper;
+import com.vincentmet.customquests.api.IJsonObjectProcessor;
+import com.vincentmet.customquests.api.IJsonObjectProvider;
 import com.vincentmet.customquests.gui.editor.EditorEntryWrapper;
 import com.vincentmet.customquests.gui.editor.IEditorEntry;
 import com.vincentmet.customquests.gui.editor.IEditorPage;
 import com.vincentmet.customquests.helpers.math.Vec2i;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
@@ -130,11 +133,11 @@ public class Position extends Vec2i implements IJsonObjectProvider, IJsonObjectP
 
 	@Override
 	public void addPageEntries(List<IEditorEntry> list) {
-		list.add(new EditorEntryWrapper(new TextComponent("X"), new ResourceLocation(Ref.MODID, "integer"), this::getX, newValueObject -> {
+		list.add(new EditorEntryWrapper(Component.literal("X"), new ResourceLocation(Ref.MODID, "integer"), this::getX, newValueObject -> {
 			setX(Integer.parseInt(newValueObject.toString()));
 			EditorGuiHelper.Update.Quest.Position.requestUpdatePositionX(parentQuestId, getX());
 		}));
-		list.add(new EditorEntryWrapper(new TextComponent("Y"), new ResourceLocation(Ref.MODID, "integer"), this::getY, newValueObject -> {
+		list.add(new EditorEntryWrapper(Component.literal("Y"), new ResourceLocation(Ref.MODID, "integer"), this::getY, newValueObject -> {
 			setY(Integer.parseInt(newValueObject.toString()));
 			EditorGuiHelper.Update.Quest.Position.requestUpdatePositionY(parentQuestId, getY());
 		}));

@@ -3,15 +3,19 @@ package com.vincentmet.customquests.network.messages.sync.stc.update;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.network.messages.ICQPacket;
+import com.vincentmet.customquests.network.messages.sync.MessageUpdateSinglePlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class MessageStcSyncUpdateSingleTask {
-	private final int questId;
-	private final int taskId;
+public class MessageStcSyncUpdateSingleTask implements ICQPacket {
+	private int questId;
+	private int taskId;
 	private JsonObject jsonObject;
+
+	public MessageStcSyncUpdateSingleTask(){}
 
 	private MessageStcSyncUpdateSingleTask(int questId, int taskId, JsonObject jsonObject){
 		this.questId = questId;
@@ -29,7 +33,9 @@ public class MessageStcSyncUpdateSingleTask {
 		}
 	}
 
-	public static void encode(MessageStcSyncUpdateSingleTask packet, FriendlyByteBuf buffer){
+	@Override
+	public <T extends ICQPacket> void encode(T clazz, FriendlyByteBuf buffer) {
+		MessageStcSyncUpdateSingleTask packet = (MessageStcSyncUpdateSingleTask) clazz;
 		if(QuestHelper.doesTaskExist(packet.questId, packet.taskId) && packet.jsonObject != null){
 			buffer.writeInt(packet.questId);
 			buffer.writeInt(packet.taskId);
@@ -37,14 +43,16 @@ public class MessageStcSyncUpdateSingleTask {
 		}
 	}
 	
-	public static MessageStcSyncUpdateSingleTask decode(FriendlyByteBuf buffer) {
+	public MessageStcSyncUpdateSingleTask decode(FriendlyByteBuf buffer) {
 		if(buffer.isReadable(10)){//4 for int, 4 for int, 2+ for json
 			return new MessageStcSyncUpdateSingleTask(buffer.readInt(), buffer.readInt(), JsonParser.parseString(buffer.readUtf()).getAsJsonObject());
 		}
 		return null;
 	}
-	
-	public static void handle(final MessageStcSyncUpdateSingleTask message, Supplier<NetworkEvent.Context> ctx) {
+
+	@Override
+	public <T extends ICQPacket> void handle(T clazz, Supplier<NetworkEvent.Context> ctx) {
+		MessageStcSyncUpdateSingleTask message = (MessageStcSyncUpdateSingleTask) clazz;
 		ctx.get().enqueueWork(() -> {
 			if(message!=null){
 				EditorClientProcessor.Update.Quests.updateSingleTask(message.questId, message.taskId, message.jsonObject);

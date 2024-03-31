@@ -3,17 +3,18 @@ package com.vincentmet.customquests.standardcontent.texttypes;
 import com.vincentmet.customquests.Ref;
 import com.vincentmet.customquests.api.ITextType;
 import com.vincentmet.customquests.api.TextUtils;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 
 public class TranslationTextType implements ITextType{
     private static final ResourceLocation ID = new ResourceLocation(Ref.MODID, "translation_key");
-    private TranslatableComponent translationKey;
+    private Component translationKey;
     
     public TranslationTextType(){}
     
     public TranslationTextType(String translationKey){
-        this.translationKey = new TranslatableComponent(translationKey);
+        this.translationKey = Component.translatable(translationKey);
     }
     
     @Override
@@ -24,14 +25,14 @@ public class TranslationTextType implements ITextType{
     @Override
     public String getOgText(){
         if (translationKey != null){
-            return translationKey.getKey();
+            return ((TranslatableContents)translationKey.getContents()).getKey();
         }
         return "";
     }
     
     @Override
     public void setOgText(String newKey){
-        translationKey = new TranslatableComponent(newKey);
+        translationKey = Component.translatable(newKey);
     }
     
     @Override
@@ -42,11 +43,11 @@ public class TranslationTextType implements ITextType{
         return "";
     }
     
-    public void setTranslationKey(TranslatableComponent translationKey){
+    public void setTranslationKey(Component translationKey){
         this.translationKey = translationKey;
     }
     
-    public TranslatableComponent getTranslationKey(){
+    public Component getTranslationKey(){
         return translationKey;
     }
 }

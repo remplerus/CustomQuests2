@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.0.+', changing: true
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
@@ -13,6 +13,7 @@ apply plugin: 'maven-publish'
 repositories {
     maven{url = 'https://dvs1.progwml6.com/files/maven/'}
     maven{url 'https://maven.blamejared.com'}
+    maven{url 'https://modmaven.dev'}
 }
 
 version = property('version')
@@ -64,8 +65,9 @@ minecraft {
 dependencies {
     minecraft "net.minecraftforge:forge:${property('mc.version')}-${property('forge.version')}"
 
-    compileOnly fg.deobf("mezz.jei:jei-${property('jei.mcversion')}:${property('jei.version')}:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-${property('jei.mcversion')}:${property('jei.version')}")
+    compileOnly fg.deobf("mezz.jei:jei-${property('jei.mcversion')}-common-api:${property('jei.version')}")
+    compileOnly fg.deobf("mezz.jei:jei-${property('jei.mcversion')}-forge-api:${property('jei.version')}")
+    runtimeOnly fg.deobf("mezz.jei:jei-${property('jei.mcversion')}-forge:${property('jei.version')}")
 
     implementation 'com.intellij:annotations:+@jar'
 }

@@ -1,6 +1,10 @@
 package com.vincentmet.customquests.integrations.jei;
 
+import mezz.jei.api.constants.RecipeTypes;
+import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.recipe.IFocus;
+import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
@@ -15,19 +19,19 @@ public class JEIHelper{
     }
     
     public static void openRecipe(ItemStack ingredient){
-        if(isRuntimePresent())CQPlugin.runtime.getRecipesGui().show(CQPlugin.runtime.getRecipeManager().createFocus(IFocus.Mode.OUTPUT, ingredient));
+        if(isRuntimePresent())CQPlugin.runtime.getRecipesGui().show(CQPlugin.runtime.getJeiHelpers().getFocusFactory().createFocus(RecipeIngredientRole.OUTPUT, VanillaTypes.ITEM_STACK, ingredient));
     }
     
     public static void openUses(ItemStack ingredient){
-        if(isRuntimePresent())CQPlugin.runtime.getRecipesGui().show(CQPlugin.runtime.getRecipeManager().createFocus(IFocus.Mode.INPUT, ingredient));
+        if(isRuntimePresent())CQPlugin.runtime.getRecipesGui().show(CQPlugin.runtime.getJeiHelpers().getFocusFactory().createFocus(RecipeIngredientRole.INPUT, VanillaTypes.ITEM_STACK, ingredient));
     }
     
     public static void openRecipe(FluidStack ingredient){
-        if(isRuntimePresent())CQPlugin.runtime.getRecipesGui().show(CQPlugin.runtime.getRecipeManager().createFocus(IFocus.Mode.OUTPUT, ingredient));
+        if(isRuntimePresent())CQPlugin.runtime.getRecipesGui().show(CQPlugin.runtime.getJeiHelpers().getFocusFactory().createFocus(RecipeIngredientRole.OUTPUT, ForgeTypes.FLUID_STACK, ingredient));
     }
     
     public static void openUses(FluidStack ingredient){
-        if(isRuntimePresent())CQPlugin.runtime.getRecipesGui().show(CQPlugin.runtime.getRecipeManager().createFocus(IFocus.Mode.INPUT, ingredient));
+        if(isRuntimePresent())CQPlugin.runtime.getRecipesGui().show(CQPlugin.runtime.getJeiHelpers().getFocusFactory().createFocus(RecipeIngredientRole.INPUT, ForgeTypes.FLUID_STACK, ingredient));
     }
     
     public static boolean hasRecipe(ItemStack stack){

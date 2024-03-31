@@ -1,30 +1,36 @@
 package com.vincentmet.customquests.network.messages.sync.stc.clear;
 
 import com.vincentmet.customquests.api.EditorClientProcessor;
+import com.vincentmet.customquests.network.messages.ICQPacket;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class MessageStcSyncTempClearSingleQuest {
-    private final int questId;
+public class MessageStcSyncTempClearSingleQuest implements ICQPacket {
+    private int questId;
+
+    public MessageStcSyncTempClearSingleQuest(){}
 
     public MessageStcSyncTempClearSingleQuest(int questId){
         this.questId = questId;
     }
-    
-    public static void encode(MessageStcSyncTempClearSingleQuest packet, FriendlyByteBuf buffer){
+
+    @Override
+    public <T extends ICQPacket> void encode(T clazz, FriendlyByteBuf buffer) {
+        MessageStcSyncTempClearSingleQuest packet = (MessageStcSyncTempClearSingleQuest) clazz;
         buffer.writeInt(packet.questId);
     }
     
-    public static MessageStcSyncTempClearSingleQuest decode(FriendlyByteBuf buffer) {
+    public MessageStcSyncTempClearSingleQuest decode(FriendlyByteBuf buffer) {
         if (buffer.isReadable(4)){
             return new MessageStcSyncTempClearSingleQuest(buffer.readInt());
         }
         return null;
     }
-    
-    public static void handle(final MessageStcSyncTempClearSingleQuest message, Supplier<NetworkEvent.Context> ctx) {
+    @Override
+    public <T extends ICQPacket> void handle(T clazz, Supplier<NetworkEvent.Context> ctx) {
+        MessageStcSyncTempClearSingleQuest message = (MessageStcSyncTempClearSingleQuest) clazz;
         ctx.get().enqueueWork(() -> {
             if (message != null){
                 EditorClientProcessor.Clear.Quests.clearSingleQuest(message.questId);

@@ -12,13 +12,13 @@ import com.vincentmet.customquests.helpers.WorldHelper;
 import com.vincentmet.customquests.hierarchy.quest.ItemSlideshowTexture;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 
 public class BiomeDetectTaskType implements ITaskType{
 	private static final ResourceLocation ID = new ResourceLocation(Ref.MODID, "biome_detect");
-	private static final Component TRANSLATION = new TranslatableComponent(Ref.MODID + ".standardcontent.tasks.biome_detect");
+	private static final Component TRANSLATION = Component.translatable(Ref.MODID + ".standardcontent.tasks.biome_detect");
 	public static final List<PlayerBoundSubtaskReference> TRACKING_LIST = new ArrayList<>();
 	private int questId;
 	private int taskId;
@@ -34,7 +34,7 @@ public class BiomeDetectTaskType implements ITaskType{
 	
 	private ResourceLocation biome;
 	
-	ItemSlideshowTexture icon = new ItemSlideshowTexture(Items.COMPASS.getRegistryName(), new ItemStack(Items.COMPASS));
+	ItemSlideshowTexture icon = new ItemSlideshowTexture(ForgeRegistries.ITEMS.getKey(Items.COMPASS), new ItemStack(Items.COMPASS));
 	
 	@Override
 	public ResourceLocation getId(){

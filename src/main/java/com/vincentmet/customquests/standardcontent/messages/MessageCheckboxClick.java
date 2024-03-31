@@ -1,29 +1,35 @@
 package com.vincentmet.customquests.standardcontent.messages;
 
 import com.vincentmet.customquests.api.CombinedProgressHelper;
+import com.vincentmet.customquests.network.messages.ICQPacket;
+import com.vincentmet.customquests.network.messages.sync.MessageUpdateSinglePlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class MessageCheckboxClick{
+public class MessageCheckboxClick implements ICQPacket {
 	public int questId;
 	public int taskId;
 	public int subtaskId;
 	
+	public MessageCheckboxClick(){}
+
 	public MessageCheckboxClick(int questId, int taskId, int subtaskId){
 		this.questId = questId;
 		this.taskId = taskId;
 		this.subtaskId = subtaskId;
 	}
-	
-	public static void encode(MessageCheckboxClick packet, FriendlyByteBuf buffer){
+
+	@Override
+	public <T extends ICQPacket> void encode(T clazz, FriendlyByteBuf buffer) {
+		MessageCheckboxClick packet = (MessageCheckboxClick) clazz;
 		buffer.writeInt(packet.questId);
 		buffer.writeInt(packet.taskId);
 		buffer.writeInt(packet.subtaskId);
 	}
 	
-	public static MessageCheckboxClick decode(FriendlyByteBuf buffer) {
+	public MessageCheckboxClick decode(FriendlyByteBuf buffer) {
 		if(buffer.readableBytes() >= 12){
 			int questId = buffer.readInt();
 			int taskId = buffer.readInt();
@@ -32,8 +38,10 @@ public class MessageCheckboxClick{
 		}
 		return null;
 	}
-	
-	public static void handle(final MessageCheckboxClick message, Supplier<NetworkEvent.Context> ctx) {
+
+	@Override
+	public <T extends ICQPacket> void handle(T clazz, Supplier<NetworkEvent.Context> ctx) {
+		MessageCheckboxClick message = (MessageCheckboxClick) clazz;
 		ctx.get().enqueueWork(() -> {
 			if(message!=null){
 				CombinedProgressHelper.setValue(ctx.get().getSender().getUUID(), message.questId, message.taskId, message.subtaskId, 1);

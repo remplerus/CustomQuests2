@@ -7,7 +7,7 @@ import com.vincentmet.customquests.helpers.math.Vec2i;
 import com.vincentmet.customquests.helpers.rendering.VariableButton;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.function.IntSupplier;
@@ -48,7 +48,7 @@ public class QuestSelector extends Screen {
     private ScrollableList enabledList;
 
     public QuestSelector() {
-        super(new TextComponent("title :3"));
+        super(Component.literal("title :3"));
         reInit();
     }
 

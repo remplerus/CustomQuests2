@@ -1,35 +1,38 @@
 package com.vincentmet.customquests;
 
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.event.RegistryEvent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegisterEvent;
 
 @Mod.EventBusSubscriber(modid = Ref.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModEventHandler{
     @SubscribeEvent
-    public static void registerItem(RegistryEvent.Register<Item> event){
-        //Main
-        event.getRegistry().registerAll(Objects.Items.QUESTING_DEVICE);
-        event.getRegistry().registerAll(Objects.ItemBlocks.QUESTING_BLOCK);
-        //Standard Content
-        //event.getRegistry().registerAll(Objects.ItemBlocks.DELIVERY_BLOCK);
-    }
-    
-    @SubscribeEvent
-    public static void registerBlock(RegistryEvent.Register<Block> event){
-        //Main
-        event.getRegistry().registerAll(Objects.Blocks.QUESTING_BLOCK);
-        //Standard Content
-        //event.getRegistry().registerAll(Objects.Blocks.DELIVERY_BLOCK);
-    }
-    
-    @SubscribeEvent
-    public static void registerTileEntityTypes(RegistryEvent.Register<BlockEntityType<?>> event){
-        //Standard Content
-        //event.getRegistry().registerAll(Objects.TileEntities.DELIVERY_BLOCK);
+    public static void registerItem(RegisterEvent event){
+        event.register(ForgeRegistries.Keys.ITEMS,
+                helper -> {
+                    //Main
+                    helper.register(new ResourceLocation(Ref.MODID, "questing_device"), Objects.Items.QUESTING_DEVICE);
+                    helper.register(new ResourceLocation(Ref.MODID, "questing_block"), Objects.ItemBlocks.QUESTING_BLOCK);
+                    //Standard Content
+                    //helper.register(new ResourceLocation(Ref.MODID, "delivery_block"), Objects.ItemBlocks.DELIVERY_BLOCK);
+                }
+        );
+        event.register(ForgeRegistries.Keys.BLOCKS,
+                helper -> {
+                    //Main
+                    helper.register(new ResourceLocation(Ref.MODID, "questing_block"), Objects.Blocks.QUESTING_BLOCK);
+                    //Standard Content
+                    //event.getRegistry().registerAll(Objects.Blocks.DELIVERY_BLOCK);
+                }
+        );
+        event.register(ForgeRegistries.Keys.BLOCK_ENTITY_TYPES,
+                helper -> {
+                    //Standard Content
+                    //helper.register(new ResourceLocation(Ref.MODID, "delivery_block"), Objects.TileEntities.DELIVERY_BLOCK);
+                }
+        );
     }
 	
 	/*@SubscribeEvent

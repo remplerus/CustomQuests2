@@ -2,19 +2,22 @@ package com.vincentmet.customquests.network.messages.sync.stc.delete;
 
 import com.vincentmet.customquests.api.ClientUtils;
 import com.vincentmet.customquests.api.EditorClientProcessor;
+import com.vincentmet.customquests.network.messages.ICQPacket;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class MessageStcSyncDeleteAllQuests {
-    public static void encode(MessageStcSyncDeleteAllQuests packet, FriendlyByteBuf buffer){}
+public class MessageStcSyncDeleteAllQuests implements ICQPacket {
+    @Override
+    public <T extends ICQPacket> void encode(T clazz, FriendlyByteBuf buffer) {}
     
-    public static MessageStcSyncDeleteAllQuests decode(FriendlyByteBuf buffer) {
+    public MessageStcSyncDeleteAllQuests decode(FriendlyByteBuf buffer) {
         return new MessageStcSyncDeleteAllQuests();
     }
-    
-    public static void handle(final MessageStcSyncDeleteAllQuests message, Supplier<NetworkEvent.Context> ctx) {
+
+    @Override
+    public <T extends ICQPacket> void handle(T clazz, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             EditorClientProcessor.Delete.deleteAllQuests();
             ClientUtils.reloadMainGuiIfOpen();

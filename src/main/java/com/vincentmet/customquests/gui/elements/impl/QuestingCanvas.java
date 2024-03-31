@@ -14,8 +14,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -79,18 +77,18 @@ public class QuestingCanvas implements IHoverRenderable, CQGuiEventListener {
 		        })
 		        .forEach(entry -> {
 					List<Component> questInfoList = new ArrayList<>();
-					questInfoList.add(new TextComponent(entry.getValue().getTitle().getStyledText() + ChatFormatting.RESET + " #" + entry.getKey()));
-					questInfoList.add(new TextComponent(entry.getValue().getSubtitle().getStyledText()));
+					questInfoList.add(Component.literal(entry.getValue().getTitle().getStyledText() + ChatFormatting.RESET + " #" + entry.getKey()));
+					questInfoList.add(Component.literal(entry.getValue().getSubtitle().getStyledText()));
 					if(!CombinedProgressHelper.isQuestUnlocked(PLAYER.getUUID(), entry.getValue().getQuestId())){
-						questInfoList.add(new TextComponent(""));
+						questInfoList.add(Component.literal(""));
 						if(entry.getValue().getDependencyList().getLogicType() == LogicType.OR){
-							questInfoList.add(new TranslatableComponent("customquests.screens.complete_one", entry.getValue().getDependencyList().getLogicType()));
+							questInfoList.add(Component.translatable("customquests.screens.complete_one", entry.getValue().getDependencyList().getLogicType()));
 						}else{
-							questInfoList.add(new TranslatableComponent("customquests.screens.complete_all", entry.getValue().getDependencyList().getLogicType()));
+							questInfoList.add(Component.translatable("customquests.screens.complete_all", entry.getValue().getDependencyList().getLogicType()));
 						}
 						entry.getValue().getDependencyList().asQuestList().forEach(quest -> {
 							if(!CombinedProgressHelper.isQuestCompleted(PLAYER.getUUID(), quest.getQuestId())){
-								questInfoList.add(new TextComponent("  - " + quest.getTitle().getStyledText() + ChatFormatting.RESET + " #" + quest.getQuestId()));
+								questInfoList.add(Component.literal("  - " + quest.getTitle().getStyledText() + ChatFormatting.RESET + " #" + quest.getQuestId()));
 							}
 						});
 					}

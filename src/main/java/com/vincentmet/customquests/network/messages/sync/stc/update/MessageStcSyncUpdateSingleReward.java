@@ -3,15 +3,19 @@ package com.vincentmet.customquests.network.messages.sync.stc.update;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.network.messages.ICQPacket;
+import com.vincentmet.customquests.network.messages.sync.MessageUpdateSinglePlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class MessageStcSyncUpdateSingleReward {
-	private final int questId;
-	private final int rewardId;
+public class MessageStcSyncUpdateSingleReward implements ICQPacket {
+	private int questId;
+	private int rewardId;
 	private JsonObject jsonObject;
+
+	public MessageStcSyncUpdateSingleReward(){}
 
 	private MessageStcSyncUpdateSingleReward(int questId, int rewardId, JsonObject jsonObject){
 		this.questId = questId;
@@ -29,7 +33,9 @@ public class MessageStcSyncUpdateSingleReward {
 		}
 	}
 
-	public static void encode(MessageStcSyncUpdateSingleReward packet, FriendlyByteBuf buffer){
+	@Override
+	public <T extends ICQPacket> void encode(T clazz, FriendlyByteBuf buffer) {
+		MessageStcSyncUpdateSingleReward packet = (MessageStcSyncUpdateSingleReward) clazz;
 		if(QuestHelper.doesRewardExist(packet.questId, packet.rewardId) && packet.jsonObject != null){
 			buffer.writeInt(packet.questId);
 			buffer.writeInt(packet.rewardId);
@@ -37,14 +43,16 @@ public class MessageStcSyncUpdateSingleReward {
 		}
 	}
 	
-	public static MessageStcSyncUpdateSingleReward decode(FriendlyByteBuf buffer) {
+	public MessageStcSyncUpdateSingleReward decode(FriendlyByteBuf buffer) {
 		if(buffer.isReadable(10)){//4 for int, 4 for int, 2+ for json
 			return new MessageStcSyncUpdateSingleReward(buffer.readInt(), buffer.readInt(), JsonParser.parseString(buffer.readUtf()).getAsJsonObject());
 		}
 		return null;
 	}
-	
-	public static void handle(final MessageStcSyncUpdateSingleReward message, Supplier<NetworkEvent.Context> ctx) {
+
+	@Override
+	public <T extends ICQPacket> void handle(T clazz, Supplier<NetworkEvent.Context> ctx) {
+		MessageStcSyncUpdateSingleReward message = (MessageStcSyncUpdateSingleReward) clazz;
 		ctx.get().enqueueWork(() -> {
 			if(message!=null){
 				EditorClientProcessor.Update.Quests.updateSingleReward(message.questId, message.rewardId, message.jsonObject);

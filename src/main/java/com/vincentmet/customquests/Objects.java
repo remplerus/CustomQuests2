@@ -12,16 +12,16 @@ import net.minecraft.world.level.block.Block;
 
 public class Objects{
 	public static final class ItemBlocks{
-		public static final Item QUESTING_BLOCK = new BlockItem(Blocks.QUESTING_BLOCK, new Item.Properties().tab(ItemGroups.cqTab)).setRegistryName(new ResourceLocation(Ref.MODID, "questing_block"));
-		//public static final Item DELIVERY_BLOCK = new BlockItem(Blocks.DELIVERY_BLOCK, new Item.Properties().group(ItemGroups.cqTab)).setRegistryName(new ResourceLocation(Ref.MODID, "delivery_block"));
+		public static final Item QUESTING_BLOCK = new BlockItem(Blocks.QUESTING_BLOCK, new Item.Properties().tab(ItemGroups.cqTab));
+		//public static final Item DELIVERY_BLOCK = new BlockItem(Blocks.DELIVERY_BLOCK, new Item.Properties().group(ItemGroups.cqTab));
 	}
 	
 	public static final class Items{
-		public static final Item QUESTING_DEVICE = new QuestingDevice(new Item.Properties().tab(ItemGroups.cqTab)).setRegistryName(new ResourceLocation(Ref.MODID, "questing_device"));
+		public static final Item QUESTING_DEVICE = new QuestingDevice(new Item.Properties().tab(ItemGroups.cqTab));
 	}
 	
 	public static final class Blocks{
-		public static final Block QUESTING_BLOCK = new QuestingBlock().setRegistryName(new ResourceLocation(Ref.MODID, "questing_block"));
+		public static final Block QUESTING_BLOCK = new QuestingBlock();
 		//public static final Block DELIVERY_BLOCK = new DeliveryBlock().setRegistryName(new ResourceLocation(Ref.MODID, "delivery_block"));
 	}
 	
