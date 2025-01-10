@@ -105,7 +105,7 @@ public class Tasks extends HashMap<Integer, Task> implements IJsonObjectProvider
 									String jsonStringType = jsonObjectValuePrimitive.getAsString();
 									if(CQRegistry.getTaskTypes().keySet().stream().anyMatch(tasktypeId -> tasktypeId.toString().equals(jsonStringType))){
 										Task task = new Task(questId, keyInt, new ResourceLocation(jsonStringType));
-										task.processJson(jsonObjectValue);
+										//task.processJson(jsonObjectValue);
 										put(Integer.parseInt(key), task);
 									}else{
 										Ref.CustomQuests.LOGGER.fatal("'Quest > " + questId + " > tasks > entries > " + counter.getValue() + " > type': Value does not match a registered TaskType, please download the addon mod it belongs to, or change it to something valid, discarding it for now! THIS ERROR SHOULDN'T HAPPEN!");

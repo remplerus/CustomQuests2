@@ -28,7 +28,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.util.thread.EffectiveSide;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.network.PacketDistributor;
 
@@ -43,7 +42,7 @@ public class CQCommand{
                 .then(registerPartyCommand())
                 .then(registerProgressCommand())
                 .then(registerGiveCommand())
-                //.then(registerEditorCommand())//todo uncomment when devving editor
+                //.then(registerEditorCommand())
                 .then(registerSettingsCommand())
                 .then(registerInfoCommand())
                 .then(registerReloadCommand())
@@ -524,7 +523,7 @@ public class CQCommand{
                          return 0;
                      })
                 )
-                /*.then(Commands.literal("edit_mode")//todo uncomment when devving the editor
+                /*.then(Commands.literal("edit_mode")
                      .then(Commands.argument("value", BoolArgumentType.bool())
                            .executes(context -> {
                                Config.ServerConfig.EDIT_MODE = BoolArgumentType.getBool(context, "value");

@@ -30,6 +30,7 @@ public class EditorServerProcessor {
             if (QuestHelper.doesQuestExist(questId)) {
                 int newTaskId = QuestHelper.getNextAvailableTaskId(questId);
                 Task t = new Task(questId, newTaskId, new ResourceLocation(Ref.MODID, "item_detect"));//todo check out if it's possible to have a Task constructor without a type parameter!
+                t.processJson(new JsonObject());
                 QuestingStorage.getSidedQuestsMap().get(questId).getTasks().put(newTaskId, t);
                 ServerUtils.Packets.SyncToClient.Data.Quests.syncTask(questId, newTaskId);
             }

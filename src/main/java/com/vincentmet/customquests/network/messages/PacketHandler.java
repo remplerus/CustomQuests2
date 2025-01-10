@@ -59,7 +59,7 @@ public class PacketHandler{
 		//editor/cts
 		//editor/cts/requests
 		//editor/cts/requests/create
-		/*CHANNEL.registerMessage(nextID(), MessageEditorRequestCreateChapter.class, MessageEditorRequestCreateChapter::encode, MessageEditorRequestCreateChapter::decode, MessageEditorRequestCreateChapter::handle);
+		CHANNEL.registerMessage(nextID(), MessageEditorRequestCreateChapter.class, MessageEditorRequestCreateChapter::encode, MessageEditorRequestCreateChapter::decode, MessageEditorRequestCreateChapter::handle);
 		CHANNEL.registerMessage(nextID(), MessageEditorRequestCreateQuest.class, MessageEditorRequestCreateQuest::encode, MessageEditorRequestCreateQuest::decode, MessageEditorRequestCreateQuest::handle);
 		CHANNEL.registerMessage(nextID(), MessageEditorRequestCreateReward.class, MessageEditorRequestCreateReward::encode, MessageEditorRequestCreateReward::decode, MessageEditorRequestCreateReward::handle);
 		CHANNEL.registerMessage(nextID(), MessageEditorRequestCreateSubreward.class, MessageEditorRequestCreateSubreward::encode, MessageEditorRequestCreateSubreward::decode, MessageEditorRequestCreateSubreward::handle);
@@ -103,7 +103,7 @@ public class PacketHandler{
 		CHANNEL.registerMessage(nextID(), MessageEditorRequestUpdateQuestTextType.class, MessageEditorRequestUpdateQuestTextType::encode, MessageEditorRequestUpdateQuestTextType::decode, MessageEditorRequestUpdateQuestTextType::handle);
 		CHANNEL.registerMessage(nextID(), MessageEditorRequestUpdateQuestTitleText.class, MessageEditorRequestUpdateQuestTitleText::encode, MessageEditorRequestUpdateQuestTitleText::decode, MessageEditorRequestUpdateQuestTitleText::handle);
 		CHANNEL.registerMessage(nextID(), MessageEditorRequestUpdateQuestTitleType.class, MessageEditorRequestUpdateQuestTitleType::encode, MessageEditorRequestUpdateQuestTitleType::decode, MessageEditorRequestUpdateQuestTitleType::handle);
-		*///sync
+		//sync
 		registerPacket(new MessageUpdateDelivery(), NetworkDirection.PLAY_TO_SERVER);
 		registerPacket(new MessageUpdateServerSettings(), NetworkDirection.PLAY_TO_CLIENT);
 		//sync/stc

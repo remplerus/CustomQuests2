@@ -5,6 +5,7 @@ import com.vincentmet.customquests.Ref;
 import com.vincentmet.customquests.api.ClientUtils;
 import com.vincentmet.customquests.api.QuestingStorage;
 import com.vincentmet.customquests.gui.editor.*;
+import com.vincentmet.customquests.gui.editor.usercontent.EntitySelector;
 import com.vincentmet.customquests.gui.elements.ScrollableList;
 import com.vincentmet.customquests.helpers.Container;
 import com.vincentmet.customquests.helpers.IntCounter;
@@ -15,8 +16,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Blaze;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -199,8 +207,8 @@ public class EditorScreen extends Screen {
                 cumulativeHeight.count();
                 break;
             case QUEST_TASKS:
-                Container<Integer> questTaskContainer = new Container<>(cumulativeHeight.getValue());
                 QuestingStorage.getSidedQuestsMap().get(screenManager.getSelectedQuestId()).getTasks().values().forEach(task -> {
+                    Container<Integer> questTaskContainer = new Container<>(cumulativeHeight.getValue());
                     selectorList.add(new EditorBlancButton(SELECTION_BUTTONS_X, questTaskContainer::get, SELECTION_BUTTONS_WIDTH, String.valueOf(task.getId()), mouseButton -> {
                         screenManager.setSelectedTaskId(task.getId());
                         screenManager.set(MenuSelection.QUEST_TASK);
@@ -286,11 +294,11 @@ public class EditorScreen extends Screen {
             selectorList.setWidth(SELECTION_BUTTONS_WIDTH);
         }
         if(selectorList.getEntries().size() >= 1 && selectorList.getEntries().get(0).getY().getAsInt() != 20-selectorList.getScrollDistance()){
-            IntCounter chapterListCounter = new IntCounter(SELECTION_BUTTONS_Y.getAsInt()-selectorList.getScrollDistance(), SELECTOR_BUTTON_HEIGHT.getAsInt());
+            IntCounter selectorListCounter = new IntCounter(SELECTION_BUTTONS_Y.getAsInt()-selectorList.getScrollDistance(), SELECTOR_BUTTON_HEIGHT.getAsInt());
             selectorList.getEntries().forEach(entry -> {
-                Container<Integer> chapterListCounterContainer = new Container<>(chapterListCounter.getValue());
+                Container<Integer> chapterListCounterContainer = new Container<>(selectorListCounter.getValue());
                 entry.setY(chapterListCounterContainer::get);
-                chapterListCounter.count();
+                selectorListCounter.count();
             });
         }
         parentButton.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -321,6 +329,8 @@ public class EditorScreen extends Screen {
         }
         TooltipBuffer.tooltipBuffer.forEach(Runnable::run);
         actionQueue.execute();
+
+        EntitySelector.renderEntityInInventoryRaw(200, 200, 30, 0, 0, EntityType.ENDER_DRAGON.create(this.minecraft.level));//todo add mouse rotation??!! and move this to the correct class
     }
     
     @Override

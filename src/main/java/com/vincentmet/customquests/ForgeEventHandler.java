@@ -70,7 +70,7 @@ public class ForgeEventHandler{
 	@SubscribeEvent
 	public static void onWorldSave(LevelEvent.Save event){
 		//Main
-		if(event.getLevel() instanceof ServerLevel && event.getLevel().dimensionType().equals(BuiltinDimensionTypes.OVERWORLD.location())){
+		if(event.getLevel() instanceof ServerLevel && event.getLevel().dimensionType().effectsLocation().equals(BuiltinDimensionTypes.OVERWORLD_EFFECTS)){
 			CQHelper.writeQuestsAndChaptersToFile(Ref.PATH_CONFIG, Ref.FILENAME_QUESTS + Ref.FILE_EXT_JSON);
 			CQHelper.writePlayersAndPartiesToFile(Ref.currentProgressDirectory, Ref.FILENAME_PARTIES + Ref.FILE_EXT_JSON);
 		}
