@@ -1,0 +1,286 @@
+package com.vincentmet.customquests.events;
+
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.vincentmet.customquests.Config;
+import com.vincentmet.customquests.Constants;
+import com.vincentmet.customquests.ForgeBaseClass;
+import com.vincentmet.customquests.Objects;
+import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.helpers.PlayerBoundSubtaskReference;
+import com.vincentmet.customquests.standardcontent.tasktypes.*;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
+import net.minecraft.world.level.storage.LevelResource;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.util.thread.EffectiveSide;
+import net.minecraftforge.items.ItemHandlerHelper;
+
+import java.util.UUID;
+
+@Mod.EventBusSubscriber(modid = Constants.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+public class ForgeEventHandler{
+	@SubscribeEvent
+	public static void onWorldStart(LevelEvent.Load event){
+		//Main
+		if(event.getLevel() instanceof ServerLevel && event.getLevel().dimensionType().effectsLocation().equals(BuiltinDimensionTypes.OVERWORLD_EFFECTS)){
+			Constants.currentServerInstance = ((ServerLevel)event.getLevel()).getServer();
+			Constants.currentWorldDirectory = ((ServerLevel)event.getLevel()).getServer().getWorldPath(new LevelResource("."));
+			Constants.currentProgressDirectory = Constants.currentWorldDirectory.resolve(Constants.MODID);
+			Constants.progressBackupDirectory = Constants.currentProgressDirectory.resolve("backups");
+			if(!event.getLevel().isClientSide()){
+				MinecraftForge.EVENT_BUS.post(new DataLoadingEvent.Pre());
+				CQHelper.readAllFilesAndPutIntoHashmaps();
+				MinecraftForge.EVENT_BUS.post(new DataLoadingEvent.Post());
+			}
+		}
+	}
+	
+	@SubscribeEvent
+	public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event){
+		//Main
+		CQHelper.generateMissingProgress(event.getEntity().getUUID());
+		CQHelper.generateMissingPartyProgress();
+		ServerUtils.Packets.SyncToClient.Data.syncAllChaptersAndQuestsToPlayer((ServerPlayer)event.getEntity());
+		ServerUtils.Packets.SyncToClient.Progress.syncAllProgressAndPartiesToPlayer((ServerPlayer)event.getEntity());
+		ServerUtils.Packets.SyncToClient.Config.syncConfigToPlayer((ServerPlayer)event.getEntity());
+		
+		if(Config.SidedConfig.giveDeviceOnFirstLogin()){
+			if(event.getEntity() instanceof ServerPlayer player){
+				if(player.getStats().getValue(Stats.CUSTOM.get(Stats.LEAVE_GAME)) == 0){
+					ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Objects.Items.QUESTING_DEVICE));
+				}
+			}
+		}
+	}
+	
+	@SubscribeEvent
+	public static void onWorldSave(LevelEvent.Save event){
+		//Main
+		if(event.getLevel() instanceof ServerLevel && event.getLevel().dimensionType().effectsLocation().equals(BuiltinDimensionTypes.OVERWORLD_EFFECTS)){
+			CQHelper.writeQuestsAndChaptersToFile(ForgeBaseClass.PATH_CONFIG, Constants.FILENAME_QUESTS + Constants.FILE_EXT_JSON);
+			CQHelper.writePlayersAndPartiesToFile(Constants.currentProgressDirectory, Constants.FILENAME_PARTIES + Constants.FILE_EXT_JSON);
+		}
+	}
+
+	@SubscribeEvent
+	public static void onWorldTick(TickEvent.LevelTickEvent event){
+		//Main
+		if(event.side.isServer() && event.level.getGameTime() % 100 == 0 && event.phase == TickEvent.Phase.START){
+			event.level.players().forEach(playerEntity -> MinecraftForge.EVENT_BUS.post(new CheckCycleEvent(playerEntity)));
+		}
+	}
+	
+	@SubscribeEvent
+	public static void onCraft(PlayerEvent.ItemCraftedEvent event){
+		//Standard Content
+		if(EffectiveSide.get().isServer()){
+			UUID uuid = event.getEntity().getUUID();
+			ItemCraftTaskType.TRACKING_LIST
+					.stream()
+					.filter(entry -> entry.getPlayer().toString().equals(uuid.toString()))
+					.forEach(entry -> {
+						QuestingStorage.getSidedQuestsMap().get(entry.getQuestId())
+						                                 .getTasks().get(entry.getTaskId())
+						                                 .getSubtasks().get(entry.getSubtaskId())
+						                                 .getSubtask().executeSubtaskCheck(event.getEntity(), event);
+					});
+		}
+	}
+	
+	@SubscribeEvent
+	public static void onEntityKill(LivingDeathEvent event){
+		//Standard Content
+		if(EffectiveSide.get().isServer()){
+			Entity source = event.getSource().getEntity();
+			if(source instanceof Player){
+				UUID uuid = source.getUUID();
+				HuntTaskType.TRACKING_LIST
+						.stream()
+						.filter(entry -> entry.getPlayer().toString().equals(uuid.toString()))
+						.forEach(entry -> {
+							QuestingStorage.getSidedQuestsMap().get(entry.getQuestId())
+										   .getTasks().get(entry.getTaskId())
+										   .getSubtasks().get(entry.getSubtaskId())
+										   .getSubtask().executeSubtaskCheck((Player)source, event);
+						});
+			}
+		}
+	}
+	
+	@SubscribeEvent
+	public static void onBlockMined(BlockEvent.BreakEvent event){
+		//Standard Content
+		if(EffectiveSide.get().isServer()){
+			Player player = event.getPlayer();
+			BlockMinedTaskType.TRACKING_LIST
+					.stream()
+					.filter(entry -> entry.getPlayer().toString().equals(player.getStringUUID()))
+					.forEach(entry -> {
+						QuestingStorage.getSidedQuestsMap().get(entry.getQuestId())
+									   .getTasks().get(entry.getTaskId())
+									   .getSubtasks().get(entry.getSubtaskId())
+									   .getSubtask().executeSubtaskCheck(player, event);
+					});
+			
+		}
+	}
+	
+	@SubscribeEvent
+	public static void onBlockPlaced(BlockEvent.EntityPlaceEvent event){
+		//Standard Content
+		if(EffectiveSide.get().isServer()){
+			if(event.getEntity() instanceof Player player){
+                BlockPlacedTaskType.TRACKING_LIST
+						.stream()
+						.filter(entry -> entry.getPlayer().toString().equals(player.getStringUUID()))
+						.forEach(entry -> {
+							QuestingStorage.getSidedQuestsMap().get(entry.getQuestId())
+										   .getTasks().get(entry.getTaskId())
+										   .getSubtasks().get(entry.getSubtaskId())
+										   .getSubtask().executeSubtaskCheck(player, event);
+						});
+			}
+		}
+	}
+	
+	@SubscribeEvent
+	public static void onSubtaskComplete(QuestEvent.Task.Subtask.Completed event){
+		//Main
+		if(CombinedProgressHelper.isTaskCompleted(event.getPlayer().getUUID(), event.getQuestId(), event.getTaskId())){
+			CombinedProgressHelper.completeTask(event.getPlayer().getUUID(), event.getQuestId(), event.getTaskId());
+		}
+		ServerUtils.Packets.SyncToClient.Progress.syncAllProgressAndPartiesToPlayer(event.getPlayer());//todo perhaps change to sendSingleSubtaskTaskToAllPlayers(ServerPlayer, questId, taskId) to reduce network data
+	}
+	
+	@SubscribeEvent
+	public static void onTaskComplete(QuestEvent.Task.Completed event){
+		//Main
+		if(QuestingStorage.getSidedPlayersMap().get(event.getPlayer().getStringUUID()).getIndividualProgress().get(event.getQuestId()).areAllTasksCompleted()){
+			QuestingStorage.getSidedPlayersMap().get(event.getPlayer().getStringUUID()).getIndividualProgress().get(event.getQuestId()).setAllTasksCompleted(true);
+			QuestingStorage.getSidedPlayersMap().get(event.getPlayer().getStringUUID()).getIndividualProgress().getIndividuallyCompletedQuests().add(event.getQuestId());
+			CombinedProgressHelper.completeQuest(event.getPlayer().getUUID(), event.getQuestId());
+		}
+		ServerUtils.Packets.SyncToClient.Progress.syncAllProgressAndPartiesToPlayer(event.getPlayer());//todo perhaps change to sendSingleTaskToAllPlayers(ServerPlayer, questId, taskId) to reduce network data
+	}
+	
+	@SubscribeEvent
+	public static void onPlayerQuestComplete(QuestEvent.Completed event){//fixme something in here calls a client side only class on the dedicated server @AlleCraft (maybe (haven't had this crash in a while, lets see if it still persists after release))
+		//Main
+		ServerUtils.Packets.SyncToClient.Progress.syncAllProgressAndPartiesToPlayer(event.getPlayer());//todo perhaps change to sendSingleQuestToAllPlayers(ServerPlayer, questId, taskId) to reduce network data
+		MinecraftServer server = event.getPlayer().getServer();
+		if(server != null){
+			if(ProgressHelper.isPlayerInParty(event.getPlayer().getUUID())){
+				int partyId = ProgressHelper.getPlayerParty(event.getPlayer().getUUID());
+				PartyHelper.getAllUUIDsInParty(partyId).forEach(uuid -> {
+					ServerPlayer playerEntity = server.getPlayerList().getPlayer(uuid);
+					if(playerEntity != null){
+						try{
+							String title = Component.translatable("customquests.general.quest_completed").getString();
+							server.getCommands().getDispatcher().execute("title " + playerEntity.getDisplayName().getString() + " title \"" + title + "\"", server.createCommandSourceStack().withSuppressedOutput());
+							server.getCommands().getDispatcher().execute("title " + playerEntity.getDisplayName().getString() + " subtitle \"" + QuestHelper.getQuestFromId(event.getQuestId()).getTitle().getStyledText()  + " #" + event.getQuestId() + "\"", server.createCommandSourceStack().withSuppressedOutput());
+						}catch(CommandSyntaxException ignored){}
+					}
+				});
+			}else{
+				try{
+					String title = Component.translatable("customquests.general.quest_completed").getString();
+					server.getCommands().getDispatcher().execute("title " + event.getPlayer().getDisplayName().getString() + " title \"" + title + "\"", server.createCommandSourceStack().withSuppressedOutput());
+					server.getCommands().getDispatcher().execute("title " + event.getPlayer().getDisplayName().getString() + " subtitle \"" + QuestHelper.getQuestFromId(event.getQuestId()).getTitle().getStyledText()  + " #" + event.getQuestId() + "\"", server.createCommandSourceStack().withSuppressedOutput());
+				}catch(CommandSyntaxException ignored){}
+			}
+		}
+	}
+	
+	@SubscribeEvent
+	public static void onCheckCycle(CheckCycleEvent event){
+		//Main
+		MinecraftForge.EVENT_BUS.post(new DataLoadingEvent.Pre());
+		event.getPlayer().level().players().forEach(playerEntity -> {
+			QuestingStorage.getSidedQuestsMap().entrySet().stream()
+						   .filter(entry -> !CombinedProgressHelper.isQuestCompleted(playerEntity.getUUID(), entry.getKey()))
+						   .filter(entry -> CombinedProgressHelper.isQuestUnlocked(playerEntity.getUUID(), entry.getKey()))
+						   .forEach(questEntry -> {
+							   questEntry.getValue().getTasks().entrySet().stream()
+										 .filter(taskEntry -> !CombinedProgressHelper.isTaskCompleted(playerEntity.getUUID(), questEntry.getKey(), taskEntry.getKey()))
+										 .forEach(taskEntry -> {
+											 taskEntry.getValue().getSubtasks().entrySet().stream()
+													  .filter(entrySubtask -> !CombinedProgressHelper.isSubtaskCompleted(playerEntity.getUUID(), questEntry.getKey(), taskEntry.getKey(), entrySubtask.getKey()))
+													  .forEach(entrySubtask -> entrySubtask.getValue().getSubtask().getCurrentlyTrackingList().add(new PlayerBoundSubtaskReference(playerEntity.getUUID(), questEntry.getKey(), taskEntry.getKey(), entrySubtask.getKey())));
+										 });
+						   });
+		});
+		MinecraftForge.EVENT_BUS.post(new DataLoadingEvent.Post());
+		
+		//Standard Content
+		Player player = event.getPlayer();
+		if(EffectiveSide.get().isServer()){
+			ItemDetectTaskType.TRACKING_LIST
+					.stream()
+					.filter(entry->entry.getPlayer().toString().equals(player.getStringUUID()))
+					.forEach(entry-> QuestingStorage.getSidedQuestsMap().get(entry.getQuestId())
+				                               .getTasks().get(entry.getTaskId())
+				                               .getSubtasks().get(entry.getSubtaskId())
+				                               .getSubtask().executeSubtaskCheck(player, null));
+			TravelTaskType.TRACKING_LIST
+					.stream()
+					.filter(entry->entry.getPlayer().toString().equals(player.getStringUUID()))
+					.forEach(entry->QuestingStorage.getSidedQuestsMap().get(entry.getQuestId())
+							.getTasks().get(entry.getTaskId())
+							.getSubtasks().get(entry.getSubtaskId())
+							.getSubtask().executeSubtaskCheck(player, null));
+			BiomeDetectTaskType.TRACKING_LIST
+					.stream()
+					.filter(entry->entry.getPlayer().toString().equals(player.getStringUUID()))
+					.forEach(entry->QuestingStorage.getSidedQuestsMap().get(entry.getQuestId())
+							.getTasks().get(entry.getTaskId())
+							.getSubtasks().get(entry.getSubtaskId())
+							.getSubtask().executeSubtaskCheck(player, null));
+			XpDetectTaskType.TRACKING_LIST
+					.stream()
+					.filter(entry->entry.getPlayer().toString().equals(player.getStringUUID()))
+					.forEach(entry->QuestingStorage.getSidedQuestsMap().get(entry.getQuestId())
+							.getTasks().get(entry.getTaskId())
+							.getSubtasks().get(entry.getSubtaskId())
+							.getSubtask().executeSubtaskCheck(player, null));
+		}
+	}
+	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public static void syncProgressEvent(CheckCycleEvent event){
+		UUID eventPlayerUUID = event.getPlayer().getUUID();
+		if(ProgressHelper.isPlayerInParty(eventPlayerUUID)){
+			int partyId = ProgressHelper.getPlayerParty(eventPlayerUUID);
+			PartyHelper.syncDataBetweenPartyMembers(partyId);
+		}
+	}
+	
+	@SubscribeEvent
+	public static void onPreDataLoad(DataLoadingEvent.Pre event){
+		//Standard Content
+		ItemDetectTaskType.TRACKING_LIST.clear();
+		ItemCraftTaskType.TRACKING_LIST.clear();
+		ItemSubmitTaskType.TRACKING_LIST.clear();
+		TravelTaskType.TRACKING_LIST.clear();
+		HuntTaskType.TRACKING_LIST.clear();
+		BiomeDetectTaskType.TRACKING_LIST.clear();
+		XpDetectTaskType.TRACKING_LIST.clear();
+		XpSubmitTaskType.TRACKING_LIST.clear();
+		BlockMinedTaskType.TRACKING_LIST.clear();
+		BlockPlacedTaskType.TRACKING_LIST.clear();
+	}
+}

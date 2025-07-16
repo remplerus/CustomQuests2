@@ -1,0 +1,140 @@
+package com.vincentmet.customquests.hierarchy.quest;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.vincentmet.customquests.Constants;
+import com.vincentmet.customquests.CustomQuestsLogger;
+import com.vincentmet.customquests.api.EditorGuiHelper;
+import com.vincentmet.customquests.api.IJsonObjectProcessor;
+import com.vincentmet.customquests.api.IJsonObjectProvider;
+import com.vincentmet.customquests.api.LogicType;
+import com.vincentmet.customquests.gui.editor.EditorEntryWrapper;
+import com.vincentmet.customquests.gui.editor.IEditorEntry;
+import com.vincentmet.customquests.gui.editor.IEditorPage;
+import com.vincentmet.customquests.helpers.IntCounter;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class SubTasks extends HashMap<Integer, SubTask> implements IJsonObjectProvider, IJsonObjectProcessor, IEditorPage {
+	private final int questId;
+	private final int taskId;
+	
+	private LogicType logicType = LogicType.AND;
+	private final ResourceLocation type;
+	
+	public SubTasks(int questId, int taskId, ResourceLocation type){
+		this.questId = questId;
+		this.taskId = taskId;
+		this.type = type;
+	}
+	
+	public SubTask put(Integer id, SubTask subtask){
+		if(id>=0){
+			super.put(id, subtask);
+		}
+		return subtask;
+	}
+	
+	@Override
+	public void processJson(JsonObject json){
+		clear();
+		
+		if(json.has("logic")){
+			JsonElement jsonElement = json.get("logic");
+			if(jsonElement.isJsonPrimitive()){
+				JsonPrimitive jsonPrimitive = jsonElement.getAsJsonPrimitive();
+				if(jsonPrimitive.isString()){
+					String operator = jsonPrimitive.getAsString();
+					if(operator.equalsIgnoreCase("AND") || operator.equalsIgnoreCase("OR")){
+						setLogicType(LogicType.valueOf(operator.toUpperCase()));
+					}else{
+						CustomQuestsLogger.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > logic': Value is not a valid operator, please use 'AND' or 'OR', defaulting to 'AND'!");
+						setLogicType(LogicType.AND);
+					}
+				}else{
+					CustomQuestsLogger.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > logic': Value is not a String, defaulting to 'AND'!");
+					setLogicType(LogicType.AND);
+				}
+			}else{
+				CustomQuestsLogger.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > logic': Value is not a JsonPrimitive, please use a String, defaulting to 'AND'!");
+				setLogicType(LogicType.AND);
+			}
+		}else{
+			CustomQuestsLogger.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > logic': Not detected, defaulting to 'AND'!");
+			setLogicType(LogicType.AND);
+		}
+		
+		if(json.has("entries")){
+			JsonElement jsonElement = json.get("entries");
+			if(jsonElement.isJsonObject()){
+				JsonObject jsonObject = jsonElement.getAsJsonObject();
+				IntCounter counter = new IntCounter();
+				for(Map.Entry<String, JsonElement> jsonEntryElement : jsonObject.entrySet()){
+					String key = jsonEntryElement.getKey();
+					int keyInt = Integer.parseInt(key);
+					JsonElement value = jsonEntryElement.getValue();
+					if(value.isJsonObject()){
+						JsonObject jsonObjectValue = value.getAsJsonObject();
+						SubTask subTask = new SubTask(questId, taskId, keyInt, type);
+						subTask.processJson(jsonObjectValue);
+						put(keyInt, subTask);
+					}else{
+						CustomQuestsLogger.warn("'Quest > " + questId + " > tasks > entries > " + counter.getValue() + "': Value is not a JsonObject, discarding it for now!");
+					}
+					counter.count();
+				}
+			}else{
+				CustomQuestsLogger.warn("'Quest > " + questId + " > tasks > entries': Value is not a JsonObject, generating a new one!");
+			}
+		}else{
+			CustomQuestsLogger.warn("'Quest > " + questId + " > tasks > entries': Not detected, generating a new JsonObject!");
+		}
+	}
+	
+	@Override
+	public JsonObject getJson(){
+		JsonObject json = new JsonObject();
+		json.addProperty("logic", logicType.toString());
+		JsonObject jsonEntries = new JsonObject();
+		for(Map.Entry<Integer, SubTask> entry : entrySet()){
+			jsonEntries.add(entry.getKey().toString(), entry.getValue().getJson());
+		}
+		json.add("entries", jsonEntries);
+		return json;
+	}
+	
+	public SubTasks setLogicType(LogicType logicType){
+		this.logicType = logicType;
+		return this;
+	}
+	
+	public LogicType getLogicType(){
+		return logicType;
+	}
+	
+	public int getQuestId(){
+		return questId;
+	}
+	
+	public int getTaskId(){
+		return taskId;
+	}
+
+	@Override
+	public void addPageEntries(List<IEditorEntry> list) {
+		list.add(new EditorEntryWrapper(Component.literal("Logic"), ResourceLocation.fromNamespaceAndPath(Constants.MODID, "plaintext"), () -> logicType.toString(), newValueObject -> {
+			if (Arrays.stream(LogicType.values()).anyMatch(logicType1 -> logicType1.toString().equals(newValueObject.toString().toUpperCase()))){
+				setLogicType(LogicType.valueOf(newValueObject.toString().toUpperCase()));
+			}else{
+				setLogicType(LogicType.AND);
+			}
+			EditorGuiHelper.Update.Quest.Tasks.Task.Subtasks.requestUpdateSubtasksLogic(questId, taskId, getLogicType());
+		}));
+	}
+}
