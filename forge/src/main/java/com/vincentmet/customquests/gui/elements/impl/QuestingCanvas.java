@@ -108,7 +108,7 @@ public class QuestingCanvas implements IHoverRenderable, CQGuiEventListener {
 						screenManager.setCurrentlySelectedQuestId(entry.getValue().getQuestId());
 						Screen currentScreen = Minecraft.getInstance().screen;
 						if(currentScreen instanceof QuestingScreen) ((QuestingScreen)currentScreen).questDetails.reInit();
-						PLAYER.playSound(QuestingStorage.SOUNDS.get("quest0"), 1, 1);
+						PLAYER.playSound(QuestingStorage.SOUNDS.get("quest" + entry.getKey()) != null ? QuestingStorage.SOUNDS.get("quest" + entry.getKey()) : QuestingStorage.SOUNDS.get("quest-default"), 1, 1);
 					}, questInfoList));
 				})
 		;

@@ -112,7 +112,7 @@ public class QuestingScreen extends Screen {
 				screenManager.setCurrentlySelectedChapterId(chapter.getId());
 				questingCanvas.applyDraggingLimits();
 				questingCanvas.reInit(questingCanvasX.getAsInt(), questingCanvasY.getAsInt(), questingCanvasWidth.getAsInt(), questingCanvasHeight.getAsInt());
-				localPlayer.playSound(QuestingStorage.SOUNDS.get("quest0"), 1, 1);
+				localPlayer.playSound(QuestingStorage.SOUNDS.get("chapter" + chapterID) != null ? QuestingStorage.SOUNDS.get("chapter" + chapterID) : QuestingStorage.SOUNDS.get("quest-default"), 1, 1);
 			}, chapterInfoList));
 			cumulativeHeight.count();
 		});
@@ -140,10 +140,10 @@ public class QuestingScreen extends Screen {
 			if(chapterList.getHeight().getAsInt() != chapterListHeight.getAsInt()){
 				chapterList.setHeight(chapterListHeight);
 			}
-			if(chapterList.getEntries().size() >=1 && chapterList.getEntries().get(0).getY().getAsInt() != 20-chapterList.getScrollDistance()){
+			if(!chapterList.getEntries().isEmpty() && chapterList.getEntries().get(0).getY().getAsInt() != 20-chapterList.getScrollDistance()){
 				IntCounter chapterListCounter = new IntCounter(20-chapterList.getScrollDistance(), BUTTON_HEIGHT.getAsInt());
 				chapterList.getEntries().forEach(entry -> {
-					entry.setY(()->chapterListCounter.getValue());
+					entry.setY(chapterListCounter::getValue);
 					chapterListCounter.count();
 				});
 			}

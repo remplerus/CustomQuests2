@@ -51,6 +51,6 @@ public class Objects{
         ITEMS.register(modEventBus);
         BLOCK_ENTITIES.register(modEventBus);
         CREATIVE_TABS.register(modEventBus);
-        QuestingStorage.SOUNDS.put("quest0", SoundEvents.UI_BUTTON_CLICK.get());
+        QuestingStorage.SOUNDS.put("quest-default", SoundEvents.UI_BUTTON_CLICK.get());
     }
 }
