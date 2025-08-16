@@ -56,8 +56,10 @@ dependencies {
     compileOnly project(":common")
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
 
-    compileOnly("mezz.jei:jei-${minecraft_version}-forge-api:15.20.0.112")
-    runtimeOnly("mezz.jei:jei-${minecraft_version}-forge:15.20.0.112")
+    //compileOnly("mezz.jei:jei-${minecraft_version}-common-api:15.20.0.112")
+    //compileOnly("mezz.jei:jei-${minecraft_version}-forge-api:15.20.0.112")
+    //runtimeOnly("mezz.jei:jei-${minecraft_version}-common:15.20.0.112")
+    //runtimeOnly("mezz.jei:jei-${minecraft_version}-forge:15.20.0.112")
 }
 
 jar {

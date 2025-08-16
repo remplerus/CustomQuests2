@@ -1,11 +1,13 @@
 package com.vincentmet.customquests.gui.elements;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.vincentmet.customquests.api.IButtonShape;
 import com.vincentmet.customquests.hierarchy.quest.Position;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.joml.Vector3f;
 
 @OnlyIn(Dist.CLIENT)
 public class Line implements MovableScalableCanvasEntry {
@@ -66,7 +68,7 @@ public class Line implements MovableScalableCanvasEntry {
         PoseStack matrixStack = guiGraphics.pose();
         matrixStack.pushPose();
         matrixStack.translate(posX+(thickness>>1), posY+(thickness>>1), 0);
-        matrixStack.mulPose(Vector3f.ZP.rotationDegrees((float)angle));
+        matrixStack.mulPose(Axis.ZP.rotationDegrees((float)angle));
         matrixStack.translate(-(posX+(thickness>>1)), -(posY+(thickness>>1)), 0);
         guiGraphics.fill(posX, posY, posX + this.length, posY + this.thickness, color);
         matrixStack.popPose();

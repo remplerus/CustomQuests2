@@ -3,14 +3,17 @@ package com.vincentmet.customquests.gui.editor.usercontent;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.registries.ForgeRegistries;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 public class EntitySelector implements ITaskEditorPage{
 
@@ -34,7 +37,7 @@ public class EntitySelector implements ITaskEditorPage{
     }
 
     public EntityType<?> getChosenEntityAsEntity(){
-        return ForgeRegistries.ENTITY_TYPES.getValue(selectedEntity);
+        return BuiltInRegistries.ENTITY_TYPE.get(selectedEntity);
     }
 
     public ResourceLocation getChosenEntityAsResourceLocation(){
@@ -52,8 +55,8 @@ public class EntitySelector implements ITaskEditorPage{
         PoseStack posestack1 = new PoseStack();
         posestack1.translate(0.0, 0.0, 1000.0);
         posestack1.scale((float)scale, (float)scale, (float)scale);
-        Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0F);
-        Quaternion quaternion1 = Vector3f.XP.rotationDegrees(f1 * 20.0F);
+        Quaternionf quaternion = Axis.ZP.rotationDegrees(180.0F);
+        Quaternionf quaternion1 = Axis.XP.rotationDegrees(f1 * 20.0F);
         quaternion.mul(quaternion1);
         posestack1.mulPose(quaternion);
         float f2 = p_98856_.yBodyRot;
@@ -68,7 +71,7 @@ public class EntitySelector implements ITaskEditorPage{
         p_98856_.yHeadRotO = p_98856_.getYRot();
         Lighting.setupForEntityInInventory();
         EntityRenderDispatcher entityrenderdispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
-        quaternion1.conj();
+        quaternion1.conjugate();
         entityrenderdispatcher.overrideCameraOrientation(quaternion1);
         entityrenderdispatcher.setRenderShadow(false);
         MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();

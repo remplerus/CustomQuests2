@@ -61,7 +61,7 @@ public class QuestList extends HashSet<Integer> implements IJsonArrayProcessor, 
 	@Override
 	public void addPageEntries(List<IEditorEntry> list) {
 		forEach(questId -> {
-			list.add(new EditorEntryWrapper(Component.literal(""), ResourceLocation.fromNamespaceAndPath(Constants.MODID, "integer"), () -> questId, newValueObject -> {
+			list.add(new EditorEntryWrapper(Component.literal(""), new ResourceLocation(Constants.MODID, "integer"), () -> questId, newValueObject -> {
 				//todo maybe create a new screen for it, passing important data to it, including the instance of the editor screen, then go back to that instance on close or on save, instead of opening a new screen
 			}));
 		});

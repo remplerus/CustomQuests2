@@ -1,8 +1,6 @@
 package com.vincentmet.customquests.block;
 
-import com.vincentmet.customquests.gui.DeliveryScreen;
 import com.vincentmet.customquests.block.blockentity.DeliveryBlockBlockEntity;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -30,10 +28,10 @@ public class DeliveryBlock extends BaseEntityBlock {
 			BlockEntity te = world.getBlockEntity(pos);
 			if(te instanceof DeliveryBlockBlockEntity){
 				if(player.getItemInHand(hand).getItem() == Items.CARROT_ON_A_STICK){
-					((DeliveryBlockBlockEntity)te).setCurrentSubmitter(player);
+					//((DeliveryBlockBlockEntity)te).setCurrentSubmitter(player);
 					//LOGGER.info("Setting player to: " + player.getDisplayName().getString());
 				}else{
-					Minecraft.getInstance().setScreen(new DeliveryScreen(pos));
+					//Minecraft.getInstance().setScreen(new DeliveryScreen(pos)); //TODO
 				}
 				return InteractionResult.PASS;
 			}
@@ -49,6 +47,7 @@ public class DeliveryBlock extends BaseEntityBlock {
 	@Nullable
 	@Override
 	public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-		return new DeliveryBlockBlockEntity(blockPos, blockState);
+		return null;
+		//return new DeliveryBlockBlockEntity(blockPos, blockState);
 	}
 }

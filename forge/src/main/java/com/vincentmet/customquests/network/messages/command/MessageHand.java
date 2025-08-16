@@ -1,7 +1,6 @@
 package com.vincentmet.customquests.network.messages.command;
 
 import com.vincentmet.customquests.network.messages.ICQPacket;
-import com.vincentmet.customquests.network.messages.button.MessageRewardClaim;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;

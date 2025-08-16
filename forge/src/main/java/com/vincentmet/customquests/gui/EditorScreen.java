@@ -1,6 +1,5 @@
 package com.vincentmet.customquests.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.api.ClientUtils;
 import com.vincentmet.customquests.api.QuestingStorage;

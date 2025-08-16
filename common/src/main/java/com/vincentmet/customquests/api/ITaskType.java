@@ -1,6 +1,5 @@
 package com.vincentmet.customquests.api;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.vincentmet.customquests.helpers.MouseButton;
 import com.vincentmet.customquests.helpers.PlayerBoundSubtaskReference;
 import net.minecraft.client.gui.GuiGraphics;

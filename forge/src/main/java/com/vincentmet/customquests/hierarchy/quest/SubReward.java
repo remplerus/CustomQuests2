@@ -46,19 +46,19 @@ public class SubReward implements IJsonObjectProvider, IJsonObjectProcessor{
 						rewardType = ResourceLocation.tryParse(jsonString);
 					}else{
 						CustomQuestsLogger.warn("'Quest > " + parentQuestId + " > rewards > entries > " + parentRewardId + " > entries > " + subRewardId + " > type': Value does not match a registered RewardType, please download the addon mod it belongs to, or change it to something valid, discarding it for now!");
-						rewardType = ResourceLocation.fromNamespaceAndPath(Constants.MODID, "items");
+						rewardType = new ResourceLocation(Constants.MODID, "items");
 					}
 				}else{
 					CustomQuestsLogger.warn("'Quest > " + parentQuestId + " > rewards > entries > " + parentRewardId + " > entries > " + subRewardId + " > type': Value is not a String, discarding it for now!");
-					rewardType = ResourceLocation.fromNamespaceAndPath(Constants.MODID, "items");
+					rewardType = new ResourceLocation(Constants.MODID, "items");
 				}
 			}else{
 				CustomQuestsLogger.warn("'Quest > " + parentQuestId + " > rewards > entries > " + parentRewardId + " > entries > " + subRewardId + " > type': Value is not a JsonPrimitive, please use a String, discarding it for now!");
-				rewardType = ResourceLocation.fromNamespaceAndPath(Constants.MODID, "items");
+				rewardType = new ResourceLocation(Constants.MODID, "items");
 			}
 		}else{
 			CustomQuestsLogger.warn("'Quest > " + parentQuestId + " > rewards > entries > " + parentRewardId + " > entries > " + subRewardId + " > type': Not detected, discarding it for now!");
-			rewardType = ResourceLocation.fromNamespaceAndPath(Constants.MODID, "items");
+			rewardType = new ResourceLocation(Constants.MODID, "items");
 		}
 		
 		if(json.has("content")){

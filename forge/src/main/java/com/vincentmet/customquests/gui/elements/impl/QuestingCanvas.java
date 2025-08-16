@@ -1,7 +1,13 @@
 package com.vincentmet.customquests.gui.elements.impl;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.ApiUtils;
+import com.vincentmet.customquests.api.ChapterHelper;
+import com.vincentmet.customquests.api.CombinedProgressHelper;
+import com.vincentmet.customquests.api.IButtonShape;
+import com.vincentmet.customquests.api.IHoverRenderable;
+import com.vincentmet.customquests.api.LogicType;
+import com.vincentmet.customquests.api.QuestHelper;
+import com.vincentmet.customquests.api.QuestingStorage;
 import com.vincentmet.customquests.gui.QuestingScreen;
 import com.vincentmet.customquests.gui.QuestingScreenManager;
 import com.vincentmet.customquests.gui.elements.Line;
@@ -102,7 +108,7 @@ public class QuestingCanvas implements IHoverRenderable, CQGuiEventListener {
 						screenManager.setCurrentlySelectedQuestId(entry.getValue().getQuestId());
 						Screen currentScreen = Minecraft.getInstance().screen;
 						if(currentScreen instanceof QuestingScreen) ((QuestingScreen)currentScreen).questDetails.reInit();
-						PLAYER.playSound(QuestingStorage.SOUNDS.get("quest" + entry.getKey()), 1, 1);
+						PLAYER.playSound(QuestingStorage.SOUNDS.get("quest0"), 1, 1);
 					}, questInfoList));
 				})
 		;
@@ -120,7 +126,7 @@ public class QuestingCanvas implements IHoverRenderable, CQGuiEventListener {
 	@Override
 	public void renderHover(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks){
 		entries.stream()
-			   .filter(entry->ApiUtils.isMouseInBounds(mouseX, mouseY, x, y, x + width, y + height))
+			   .filter(entry-> ApiUtils.isMouseInBounds(mouseX, mouseY, x, y, x + width, y + height))
 			   .forEach(entry ->entry.renderHover(matrixStack, mouseX, mouseY, partialTicks));
 	}
 	

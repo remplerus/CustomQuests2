@@ -17,7 +17,7 @@ import com.vincentmet.customquests.network.messages.sync.MessageUpdateSinglePlay
 import com.vincentmet.customquests.network.messages.sync.stc.clear.*;
 import com.vincentmet.customquests.network.messages.sync.stc.delete.*;
 import com.vincentmet.customquests.network.messages.sync.stc.update.*;
-import com.vincentmet.customquests.standardcontent.messages.MessageCheckboxClick;
+import com.vincentmet.customquests.messages.MessageCheckboxClick;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;

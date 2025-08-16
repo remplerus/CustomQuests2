@@ -3,7 +3,6 @@ package com.vincentmet.customquests.standardcontent.rewardtypes;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.CustomQuestsLogger;
 import com.vincentmet.customquests.api.ApiUtils;
@@ -11,9 +10,11 @@ import com.vincentmet.customquests.api.IItemStacksProvider;
 import com.vincentmet.customquests.api.IRewardType;
 import com.vincentmet.customquests.helpers.MouseButton;
 import com.vincentmet.customquests.helpers.TagHelper;
+import com.vincentmet.customquests.helpers.TooltipBuffer;
 import com.vincentmet.customquests.integrations.jei.JEIHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,15 +22,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class ItemsRewardType implements IRewardType, IItemStacksProvider{
-	private static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(Constants.MODID, "items");
+	private static final ResourceLocation ID = new ResourceLocation(Constants.MODID, "items");
 	private ItemStack stack = new ItemStack(Blocks.AIR);
 	
 	private ResourceLocation ogRL;
@@ -46,7 +45,7 @@ public class ItemsRewardType implements IRewardType, IItemStacksProvider{
 	
 	@Override
 	public void executeReward(ServerPlayer player){
-		ItemHandlerHelper.giveItemToPlayer(player, stack);
+		player.addItem(stack); //TODO
 	}
 	
 	@Override
@@ -56,7 +55,7 @@ public class ItemsRewardType implements IRewardType, IItemStacksProvider{
 	
 	@Override
 	public Runnable onSlotHover(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks){
-		return ()->Minecraft.getInstance().screen.renderTooltip(matrixStack, stack, mouseX, mouseY);
+		return ()->matrixStack.renderTooltip(TooltipBuffer.font, stack, mouseX, mouseY);
 	}
 	
 	@Override
@@ -109,25 +108,25 @@ public class ItemsRewardType implements IRewardType, IItemStacksProvider{
 					String jsonPrimitiveStringValue = jsonPrimitive.getAsString();
 					ogRL = ResourceLocation.tryParse(jsonPrimitiveStringValue);
 					if(ogRL != null){
-						if(!TagHelper.Items.doesTagExist(ogRL) && !ForgeRegistries.ITEMS.containsKey(ogRL)){
+						if(!TagHelper.Items.doesTagExist(ogRL) && !BuiltInRegistries.ITEM.containsKey(ogRL)){
 							CustomQuestsLogger.warn("'Quest > " + questId + " > rewards > entries > " + rewardId + " > content > item': Value is not a valid item that exists in the game, please use a valid item, defaulting to 'minecraft:grass_block'!");
-							ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
+							ogRL = BuiltInRegistries.ITEM.getKey(Items.GRASS_BLOCK);
 						}
 					}else{
 						CustomQuestsLogger.warn("'Quest > " + questId + " > rewards > entries > " + rewardId + " > content > item': Value is not a valid item ResourceLocation, defaulting to 'minecraft:grass_block'!");
-						ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
+						ogRL = BuiltInRegistries.ITEM.getKey(Items.GRASS_BLOCK);
 					}
 				}else{
 					CustomQuestsLogger.warn("'Quest > " + questId + " > rewards > entries > " + rewardId + " > content > item': Value is not a String, defaulting to 'minecraft:grass_block'!");
-					ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
+					ogRL = BuiltInRegistries.ITEM.getKey(Items.GRASS_BLOCK);
 				}
 			}else{
 				CustomQuestsLogger.warn("'Quest > " + questId + " > rewards > entries > " + rewardId + " > content > item': Value is not a JsonPrimitive, please use a String, defaulting to 'minecraft:grass_block'!");
-				ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
+				ogRL = BuiltInRegistries.ITEM.getKey(Items.GRASS_BLOCK);
 			}
 		}else{
 			CustomQuestsLogger.warn("'Quest > " + questId + " > rewards > entries > " + rewardId + " > content > item': Not detected, defaulting to 'minecraft:grass_block'!");
-			ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
+			ogRL = BuiltInRegistries.ITEM.getKey(Items.GRASS_BLOCK);
 		}
 		
 		if(json.has("count")){
@@ -177,7 +176,7 @@ public class ItemsRewardType implements IRewardType, IItemStacksProvider{
 			CustomQuestsLogger.warn("'Quest > " + questId + " > rewards > entries > " + rewardId + " > content > nbt': Not detected, defaulting to null!");
 			ogNBT = null;
 		}
-		stack = new ItemStack(ForgeRegistries.ITEMS.getValue(ogRL), count);
+		stack = new ItemStack(BuiltInRegistries.ITEM.get(ogRL), count);
 		CompoundTag tag = ApiUtils.getNbtFromJson(ogNBT);
 		if(tag != null && !tag.isEmpty())stack.setTag(tag);
 	}

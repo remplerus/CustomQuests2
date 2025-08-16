@@ -1,6 +1,5 @@
 package com.vincentmet.customquests.block;
 
-import com.vincentmet.customquests.api.ClientUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -28,7 +27,7 @@ public class QuestingBlock extends Block {
 	@Override
 	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit){
 		if(level.isClientSide()){
-			ClientUtils.openQuestingScreen();
+			//ClientUtils.openQuestingScreen(); //TODO
 			return InteractionResult.SUCCESS;
 		}
 		return InteractionResult.SUCCESS;

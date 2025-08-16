@@ -15,17 +15,19 @@ import com.vincentmet.customquests.gui.editor.IEditorEntry;
 import com.vincentmet.customquests.gui.editor.IEditorPage;
 import com.vincentmet.customquests.helpers.TagHelper;
 import com.vincentmet.customquests.hierarchy.quest.ItemSlideshowTexture;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Chapter implements IJsonObjectProvider, IJsonObjectProcessor, IEditorPage {
-	private static final IQuestingTexture DEFAULT_ICON = new ItemSlideshowTexture(ForgeRegistries.BLOCKS.getKey(Blocks.GRASS_BLOCK), new ItemStack(Blocks.GRASS_BLOCK));
+	private static final IQuestingTexture DEFAULT_ICON = new ItemSlideshowTexture(BuiltInRegistries.BLOCK.getKey(Blocks.GRASS_BLOCK), new ItemStack(Blocks.GRASS_BLOCK));
 	private final int id;
 	private IQuestingTexture icon;
 	private final ChapterTitleTextType title;
@@ -53,15 +55,15 @@ public class Chapter implements IJsonObjectProvider, IJsonObjectProcessor, IEdit
 				if(jsonPrimitive.isString()){
 					setIcon(ResourceLocation.tryParse(jsonPrimitive.getAsString()));
 				}else{
-					CustomQuestsLogger.warn("'Chapter > " + id + " > icon': Value is not a String, defaulting to '"+ForgeRegistries.BLOCKS.getKey(Blocks.GRASS_BLOCK)+"'!");
+					CustomQuestsLogger.warn("'Chapter > " + id + " > icon': Value is not a String, defaulting to '"+BuiltInRegistries.BLOCK.getKey(Blocks.GRASS_BLOCK)+"'!");
 					setIcon(DEFAULT_ICON);
 				}
 			}else{
-				CustomQuestsLogger.warn("'Chapter > " + id + " > icon': Value is not a JsonPrimitive, please use a String, defaulting to '"+ForgeRegistries.BLOCKS.getKey(Blocks.GRASS_BLOCK)+"'!");
+				CustomQuestsLogger.warn("'Chapter > " + id + " > icon': Value is not a JsonPrimitive, please use a String, defaulting to '"+BuiltInRegistries.BLOCK.getKey(Blocks.GRASS_BLOCK)+"'!");
 				setIcon(DEFAULT_ICON);
 			}
 		}else{
-			CustomQuestsLogger.warn("'Chapter > " + id + " > icon': Not detected, defaulting to '"+ForgeRegistries.BLOCKS.getKey(Blocks.GRASS_BLOCK)+"'!");
+			CustomQuestsLogger.warn("'Chapter > " + id + " > icon': Not detected, defaulting to '"+BuiltInRegistries.BLOCK.getKey(Blocks.GRASS_BLOCK)+"'!");
 			setIcon(DEFAULT_ICON);
 		}
 		
@@ -140,7 +142,7 @@ public class Chapter implements IJsonObjectProvider, IJsonObjectProcessor, IEdit
 		if (icon != null && icon.isValid()){
 			this.icon = icon;
 		}else{
-			CustomQuestsLogger.warn("'Chapter > " + id + " > icon': The given texture is either null or invalid, defaulting to '"+ForgeRegistries.BLOCKS.getKey(Blocks.GRASS_BLOCK)+"'!");
+			CustomQuestsLogger.warn("'Chapter > " + id + " > icon': The given texture is either null or invalid, defaulting to '"+BuiltInRegistries.BLOCK.getKey(Blocks.GRASS_BLOCK)+"'!");
 			setIcon(DEFAULT_ICON);
 		}
 	}
@@ -148,13 +150,20 @@ public class Chapter implements IJsonObjectProvider, IJsonObjectProcessor, IEdit
 	public void setIcon(ResourceLocation iconRL){
 		if(TagHelper.Items.doesTagExist(iconRL)){
 			List<ItemStack> tagStacks = new ArrayList<>();
-			TagHelper.Items.getEntries(iconRL).stream().map(ItemStack::new).forEach(tagStacks::add);
+            for (int i = 0; i < TagHelper.Items.getEntries(iconRL).size(); i++) {
+                HolderSet.Named<Item> tagEntry = TagHelper.Items.getEntries(iconRL).get(i);
+                for (int j = 0; j < tagEntry.size(); j++) {
+                    Item item = tagEntry.get(j).get();
+                    tagStacks.add(new ItemStack(item));
+                }
+            }
+			//TagHelper.Items.getEntries(iconRL).stream().map(HolderSet.Named::get).map(Item::get).forEach(tagStacks::add);
 			setIcon(new ItemSlideshowTexture(iconRL, tagStacks));
 		}else{
-			if(ForgeRegistries.ITEMS.containsKey(iconRL)){
-				setIcon(new ItemSlideshowTexture(iconRL, new ItemStack(ForgeRegistries.ITEMS.getValue(iconRL))));
+			if(BuiltInRegistries.ITEM.containsKey(iconRL)){
+				setIcon(new ItemSlideshowTexture(iconRL, new ItemStack(BuiltInRegistries.ITEM.get(iconRL))));
 			}else{
-				CustomQuestsLogger.warn("'Quest > " + id + " > icon': There is no valid item/tag with ResourceLocation '" + iconRL + "' found, defaulting to '"+ForgeRegistries.BLOCKS.getKey(Blocks.GRASS_BLOCK)+"'!");
+				CustomQuestsLogger.warn("'Quest > " + id + " > icon': There is no valid item/tag with ResourceLocation '" + iconRL + "' found, defaulting to '"+BuiltInRegistries.BLOCK.getKey(Blocks.GRASS_BLOCK)+"'!");
 				setIcon(DEFAULT_ICON);
 			}
 		}
@@ -162,7 +171,7 @@ public class Chapter implements IJsonObjectProvider, IJsonObjectProcessor, IEdit
 
 	@Override
 	public void addPageEntries(List<IEditorEntry> list) {
-		list.add(new EditorEntryWrapper(Component.translatable(Constants.MODID + ".editor.keys.icon"), ResourceLocation.fromNamespaceAndPath(Constants.MODID, "resourcelocation"), () -> getIcon().getResourceLocation().toString(), newValueObject -> {
+		list.add(new EditorEntryWrapper(Component.translatable(Constants.MODID + ".editor.keys.icon"), new ResourceLocation(Constants.MODID, "resourcelocation"), () -> getIcon().getResourceLocation().toString(), newValueObject -> {
 			ResourceLocation newRL = ResourceLocation.tryParse(newValueObject.toString());
 			setIcon(newRL);
 			EditorGuiHelper.Update.Chapter.requestUpdateIcon(id, getIcon().getResourceLocation());

@@ -3,7 +3,6 @@ package com.vincentmet.customquests.hierarchy.quest;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.CustomQuestsLogger;
 import com.vincentmet.customquests.api.CQRegistry;
 import com.vincentmet.customquests.api.IJsonObjectProcessor;

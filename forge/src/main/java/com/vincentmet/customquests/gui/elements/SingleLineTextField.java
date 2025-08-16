@@ -65,7 +65,7 @@ public class SingleLineTextField implements IHoverRenderable, CQGuiEventListener
         matrixStack.fill(TEXTBOX_X.getAsInt(), TEXTBOX_Y.getAsInt(), TEXTBOX_X.getAsInt() + TEXTBOX_WIDTH.getAsInt(), TEXTBOX_Y.getAsInt()+TEXTBOX_HEIGHT.getAsInt(), borderColor);
         matrixStack.fill(INSIDE_BOX_X.getAsInt(), INSIDE_BOX_Y.getAsInt(), INSIDE_BOX_X.getAsInt() + INSIDE_BOX_WIDTH.getAsInt(), INSIDE_BOX_Y.getAsInt() + INSIDE_BOX_HEIGHT.getAsInt(), backgroundColor);
         GLScissorStack.push(matrixStack, TEXTAREA_X.getAsInt(), TEXTAREA_Y.getAsInt(), TEXTAREA_WIDTH.getAsInt(), TEXTAREA_HEIGHT.getAsInt());
-        Minecraft.getInstance().font.draw(matrixStack, text, TEXTAREA_X.getAsInt() - getOffset(), TEXTAREA_Y.getAsInt(), textColor);
+        matrixStack.drawString(Minecraft.getInstance().font, text, TEXTAREA_X.getAsInt() - getOffset(), TEXTAREA_Y.getAsInt(), textColor);
         GLScissorStack.pop(matrixStack);
         renderCursor(matrixStack, mouseX, mouseY, partialTicks);
     }

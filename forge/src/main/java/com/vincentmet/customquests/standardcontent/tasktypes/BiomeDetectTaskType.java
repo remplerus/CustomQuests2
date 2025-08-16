@@ -3,16 +3,20 @@ package com.vincentmet.customquests.standardcontent.tasktypes;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.CustomQuestsLogger;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.ButtonContext;
+import com.vincentmet.customquests.api.CombinedProgressHelper;
+import com.vincentmet.customquests.api.IQuestingTexture;
+import com.vincentmet.customquests.api.ITaskType;
+import com.vincentmet.customquests.api.ServerUtils;
 import com.vincentmet.customquests.helpers.MouseButton;
 import com.vincentmet.customquests.helpers.PlayerBoundSubtaskReference;
 import com.vincentmet.customquests.helpers.WorldHelper;
 import com.vincentmet.customquests.hierarchy.quest.ItemSlideshowTexture;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,14 +24,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.biome.Biomes;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class BiomeDetectTaskType implements ITaskType{
-	private static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(Constants.MODID, "biome_detect");
+public class BiomeDetectTaskType implements ITaskType {
+	private static final ResourceLocation ID = new ResourceLocation(Constants.MODID, "biome_detect");
 	private static final Component TRANSLATION = Component.translatable(Constants.MODID + ".standardcontent.tasks.biome_detect");
 	public static final List<PlayerBoundSubtaskReference> TRACKING_LIST = new ArrayList<>();
 	private int questId;
@@ -36,7 +39,7 @@ public class BiomeDetectTaskType implements ITaskType{
 	
 	private ResourceLocation biome;
 	
-	ItemSlideshowTexture icon = new ItemSlideshowTexture(ForgeRegistries.ITEMS.getKey(Items.COMPASS), new ItemStack(Items.COMPASS));
+	ItemSlideshowTexture icon = new ItemSlideshowTexture(BuiltInRegistries.ITEM.getKey(Items.COMPASS), new ItemStack(Items.COMPASS));
 	
 	@Override
 	public ResourceLocation getId(){

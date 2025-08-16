@@ -2,7 +2,11 @@ package com.vincentmet.customquests.api;
 
 import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.gui.editor.IEditorEntry;
-import com.vincentmet.customquests.hierarchy.quest.*;
+import com.vincentmet.customquests.hierarchy.quest.Quest;
+import com.vincentmet.customquests.hierarchy.quest.Reward;
+import com.vincentmet.customquests.hierarchy.quest.SubReward;
+import com.vincentmet.customquests.hierarchy.quest.SubTask;
+import com.vincentmet.customquests.hierarchy.quest.Task;
 
 import java.util.*;
 

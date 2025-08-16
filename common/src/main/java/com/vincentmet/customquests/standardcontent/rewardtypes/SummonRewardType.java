@@ -3,14 +3,13 @@ package com.vincentmet.customquests.standardcontent.rewardtypes;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.CustomQuestsLogger;
 import com.vincentmet.customquests.api.IRewardType;
 import com.vincentmet.customquests.helpers.MouseButton;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,13 +17,12 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Objects;
 import java.util.function.Consumer;
 
 public class SummonRewardType implements IRewardType{
-	private static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(Constants.MODID, "summon");
+	private static final ResourceLocation ID = new ResourceLocation(Constants.MODID, "summon");
 	private EntityType entity;
 	private int count;
 	private Item icon = Items.DIAMOND_SWORD;
@@ -99,7 +97,7 @@ public class SummonRewardType implements IRewardType{
 					String jsonPrimitiveStringValue = jsonPrimitive.getAsString();
 					ResourceLocation rl = ResourceLocation.tryParse(jsonPrimitiveStringValue);
 					if(rl != null){
-						icon = ForgeRegistries.ITEMS.getValue(rl);
+						icon = BuiltInRegistries.ITEM.get(rl);
 					}else{
 						CustomQuestsLogger.warn("'Quest > " + parentQuestId + " > rewards > entries > " + parentRewardId + " > content > icon': Value is not a valid item, please use a valid item id, defaulting to 'minecraft:zombie_spawn_egg'!");
 						icon = Items.ZOMBIE_SPAWN_EGG;
@@ -150,7 +148,7 @@ public class SummonRewardType implements IRewardType{
 					String jsonPrimitiveStringValue = jsonPrimitive.getAsString();
 					ResourceLocation rl = ResourceLocation.tryParse(jsonPrimitiveStringValue);
 					if(rl != null){
-						entity = ForgeRegistries.ENTITY_TYPES.getValue(rl);
+						entity = BuiltInRegistries.ENTITY_TYPE.get(rl);
 					}else{
 						CustomQuestsLogger.warn("'Quest > " + parentQuestId + " > rewards > entries > " + parentRewardId + " > content > entity': Value is not a valid item, please use a valid item id, defaulting to 'minecraft:zombie_spawn_egg'!");
 						entity = EntityType.SHEEP;
@@ -172,9 +170,9 @@ public class SummonRewardType implements IRewardType{
 	@Override
 	public JsonObject getJson(){
 		JsonObject json = new JsonObject();
-		json.addProperty("entity", ForgeRegistries.ENTITY_TYPES.getKey(entity).toString());
+		json.addProperty("entity", BuiltInRegistries.ENTITY_TYPE.getKey(entity).toString());
 		json.addProperty("count", count);
-		json.addProperty("icon", ForgeRegistries.ITEMS.getKey(icon).toString());
+		json.addProperty("icon", BuiltInRegistries.ITEM.getKey(icon).toString());
 		return json;
 	}
 }

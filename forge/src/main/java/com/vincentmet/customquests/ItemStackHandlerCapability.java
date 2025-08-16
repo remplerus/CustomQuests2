@@ -13,14 +13,14 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 
-public class ItemStackHandlerCapability extends ItemStackHandler{
+public class ItemStackHandlerCapability extends ItemStackHandler {
 	private final Triple<Integer, Integer, Integer> activeSubtask = new Triple<>(-1, -1, -1);
 	private Player player;
-	private final BlockEntity te;
+	private final BlockEntity be;
 	
-	public ItemStackHandlerCapability(Player player, BlockEntity te){
+	public ItemStackHandlerCapability(Player player, BlockEntity be){
 		super(1);
-		this.te = te;
+		this.be = be;
 		this.player = player;
 	}
 	
@@ -44,13 +44,14 @@ public class ItemStackHandlerCapability extends ItemStackHandler{
 	
 	@Override
 	public void onContentsChanged(int slot){
-		if(player!=null&&activeSubtask.getLeft() >= 0 && activeSubtask.getMiddle() >= 0 && activeSubtask.getRight() >= 0){//todo DELIVERYBLOCK add some more uuid checks here
+		if(player!=null&&activeSubtask.getLeft() >= 0 && activeSubtask.getMiddle() >= 0 && activeSubtask.getRight() >= 0){
+			//todo DELIVERYBLOCK add some more uuid checks here
 			if(getStackInSlot(slot).getCount()>0){
 				CombinedProgressHelper.addValue(player.getUUID(), activeSubtask.getLeft(), activeSubtask.getMiddle(), activeSubtask.getRight(), 1);
 				setStackInSlot(slot, new ItemStack(getStackInSlot(slot).getItem(), getStackInSlot(slot).getCount()-1));
 			}
 		}
-		te.setChanged();
+		be.setChanged();
 	}
 	
 	@Override

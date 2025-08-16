@@ -11,7 +11,13 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.vincentmet.customquests.Config;
 import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.Objects;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.CQHelper;
+import com.vincentmet.customquests.api.ChapterHelper;
+import com.vincentmet.customquests.api.PartyHelper;
+import com.vincentmet.customquests.api.ProgressHelper;
+import com.vincentmet.customquests.api.QuestHelper;
+import com.vincentmet.customquests.api.QuestingStorage;
+import com.vincentmet.customquests.api.ServerUtils;
 import com.vincentmet.customquests.events.DataLoadingEvent;
 import com.vincentmet.customquests.helpers.PartyInviteCache;
 import com.vincentmet.customquests.network.messages.PacketHandler;
@@ -476,7 +482,7 @@ public class CQCommand{
         return Commands.literal("give")
                 .executes(context->{
                         try{
-                            ItemHandlerHelper.giveItemToPlayer(context.getSource().getPlayerOrException(), new ItemStack(Objects.Items.QUESTING_DEVICE, 1));
+                            ItemHandlerHelper.giveItemToPlayer(context.getSource().getPlayerOrException(), new ItemStack(Objects.QUESTING_DEVICE.get(), 1));
                         }catch(CommandSyntaxException e){
                             e.printStackTrace();
                         }

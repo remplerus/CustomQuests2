@@ -3,9 +3,12 @@ package com.vincentmet.customquests.hierarchy.progress;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.CustomQuestsLogger;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.CombinedProgressHelper;
+import com.vincentmet.customquests.api.IJsonObjectProcessor;
+import com.vincentmet.customquests.api.IJsonObjectProvider;
+import com.vincentmet.customquests.api.LogicType;
+import com.vincentmet.customquests.api.QuestingStorage;
 import com.vincentmet.customquests.helpers.BooleanContainer;
 import com.vincentmet.customquests.helpers.IntCounter;
 import net.minecraft.world.entity.player.Player;
@@ -13,7 +16,7 @@ import net.minecraftforge.fml.util.thread.EffectiveSide;
 
 import java.util.*;
 
-public class SingleTaskProgress extends HashMap<Integer, SingleSubtaskProgress> implements IJsonObjectProcessor, IJsonObjectProvider{
+public class SingleTaskProgress extends HashMap<Integer, SingleSubtaskProgress> implements IJsonObjectProcessor, IJsonObjectProvider {
 	private boolean allSubtasksCompleted = false;
 	private final UUID uuid;
 	private final int questId;
@@ -150,7 +153,7 @@ public class SingleTaskProgress extends HashMap<Integer, SingleSubtaskProgress> 
 	}
 	
 	public void executeTaskButton(Player player){
-		if(EffectiveSide.get().isServer()){
+		if(EffectiveSide.get().isServer()){ //fixme non-forge side
 			QuestingStorage.getSidedQuestsMap().get(questId).getTasks().get(taskId).getSubtasks().entrySet().stream().filter(entry->!CombinedProgressHelper.isSubtaskCompleted(player.getUUID(), questId, taskId, entry.getKey())).forEach(entry -> entry.getValue().getSubtask().executeSubtaskButton(player));
 		}
 	}

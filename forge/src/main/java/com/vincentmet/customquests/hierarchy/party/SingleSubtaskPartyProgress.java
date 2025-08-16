@@ -2,9 +2,10 @@ package com.vincentmet.customquests.hierarchy.party;
 
 import com.google.gson.*;
 import com.vincentmet.customquests.*;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.IJsonObjectProcessor;
+import com.vincentmet.customquests.api.IJsonObjectProvider;
 
-public class SingleSubtaskPartyProgress implements IJsonObjectProcessor, IJsonObjectProvider{
+public class SingleSubtaskPartyProgress implements IJsonObjectProcessor, IJsonObjectProvider {
 	private boolean completed;
 	private int value;
 	private final int partyId;

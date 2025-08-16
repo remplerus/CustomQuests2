@@ -2,11 +2,13 @@ package com.vincentmet.customquests.hierarchy.party;
 
 import com.google.gson.*;
 import com.vincentmet.customquests.*;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.IJsonObjectProcessor;
+import com.vincentmet.customquests.api.IJsonObjectProvider;
+import com.vincentmet.customquests.api.QuestingStorage;
 import com.vincentmet.customquests.helpers.IntCounter;
 import java.util.*;
 
-public class CollectiveProgress extends HashMap<Integer, SingleQuestPartyProgress> implements IJsonObjectProvider, IJsonObjectProcessor{
+public class CollectiveProgress extends HashMap<Integer, SingleQuestPartyProgress> implements IJsonObjectProvider, IJsonObjectProcessor {
     private final int parentPartyId;
     
     public CollectiveProgress(int partyId){

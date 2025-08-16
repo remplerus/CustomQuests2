@@ -16,6 +16,7 @@ public class Constants {
 	public static Path currentProgressDirectory;
 	public static Path questsBackupDirectory;
 	public static Path progressBackupDirectory;
+	public static Path PATH_CONFIG;
 	public static MinecraftServer currentServerInstance;
 	public static final int NO_PARTY = -1;
 	public static final ResourceLocation INVALID_RESOURCELOCATION = new ResourceLocation(MODID, "invalid");

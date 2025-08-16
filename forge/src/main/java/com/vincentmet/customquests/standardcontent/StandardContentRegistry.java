@@ -2,8 +2,14 @@ package com.vincentmet.customquests.standardcontent;
 
 import com.vincentmet.customquests.api.CQRegistry;
 import com.vincentmet.customquests.standardcontent.buttonshapes.Shape;
-import com.vincentmet.customquests.standardcontent.editorfieldtypes.*;
-import com.vincentmet.customquests.standardcontent.rewardtypes.*;
+import com.vincentmet.customquests.standardcontent.editorfieldtypes.DoubleFieldType;
+import com.vincentmet.customquests.standardcontent.editorfieldtypes.IntegerFieldType;
+import com.vincentmet.customquests.standardcontent.editorfieldtypes.PlainTextFieldType;
+import com.vincentmet.customquests.standardcontent.editorfieldtypes.ResourceLocationFieldType;
+import com.vincentmet.customquests.standardcontent.rewardtypes.CommandRewardType;
+import com.vincentmet.customquests.standardcontent.rewardtypes.ItemsRewardType;
+import com.vincentmet.customquests.standardcontent.rewardtypes.SummonRewardType;
+import com.vincentmet.customquests.standardcontent.rewardtypes.XpRewardType;
 import com.vincentmet.customquests.standardcontent.tasktypes.*;
 import com.vincentmet.customquests.standardcontent.texttypes.*;
 

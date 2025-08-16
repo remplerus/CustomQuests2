@@ -6,11 +6,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public class ItemRenderHelper {
@@ -19,14 +18,14 @@ public class ItemRenderHelper {
     }
 
     private static void renderGuiItem(ItemStack itemStack, int x, int y, BakedModel bakedModel, double scale, float offsetX, float offsetY) {
-        Minecraft.getInstance().textureManager.getTexture(InventoryMenu.BLOCK_ATLAS).setFilter(false, false);
+        Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).setFilter(false, false);
         RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         Color.color(0xFFFFFFFF);
         PoseStack itemPoseStack = RenderSystem.getModelViewStack();
         itemPoseStack.pushPose();
-        itemPoseStack.translate(x, y, (100.0F + Minecraft.getInstance().getItemRenderer().blitOffset));
+        itemPoseStack.translate(x, y, (100.0F + Minecraft.getInstance().getItemRenderer().ITEM_COUNT_BLIT_OFFSET)); //fixme if wrong
         itemPoseStack.scale((float)scale, (float)scale, 1);
         itemPoseStack.translate(8.0D, 8.0D, 0.0D);
         itemPoseStack.scale(1.0F, -1.0F, 1.0F);
@@ -39,7 +38,7 @@ public class ItemRenderHelper {
         if (flag) {
             Lighting.setupForFlatItems();
         }
-        Minecraft.getInstance().getItemRenderer().render(itemStack, ItemTransforms.TransformType.GUI, false, newStack, buffersource, 0xF000F0, OverlayTexture.NO_OVERLAY, bakedModel);
+        Minecraft.getInstance().getItemRenderer().render(itemStack, ItemDisplayContext.GUI, false, newStack, buffersource, 0xF000F0, OverlayTexture.NO_OVERLAY, bakedModel);
         buffersource.endBatch();
         RenderSystem.enableDepthTest();
         if (flag) {

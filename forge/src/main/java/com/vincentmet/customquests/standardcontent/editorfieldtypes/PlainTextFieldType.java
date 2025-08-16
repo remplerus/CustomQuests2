@@ -1,6 +1,5 @@
 package com.vincentmet.customquests.standardcontent.editorfieldtypes;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.gui.editor.IEditorEntry;
 import com.vincentmet.customquests.gui.editor.IEditorEntryDataType;
@@ -11,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.regex.Pattern;
 
 public class PlainTextFieldType implements IEditorEntryDataType {
-    private final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(Constants.MODID, "plaintext");
+    private final ResourceLocation ID = new ResourceLocation(Constants.MODID, "plaintext");
     private SingleLineTextField value;
     private Object initialValue;
     

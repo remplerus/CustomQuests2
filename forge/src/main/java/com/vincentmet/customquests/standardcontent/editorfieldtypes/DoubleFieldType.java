@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.regex.Pattern;
 
 public class DoubleFieldType implements IEditorEntryDataType {
-    private final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(Constants.MODID, "double");
+    private final ResourceLocation ID = new ResourceLocation(Constants.MODID, "double");
     private SingleLineTextField rlValue;
     private Object initialValue;
     

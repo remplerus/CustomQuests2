@@ -3,7 +3,6 @@ package com.vincentmet.customquests.standardcontent.tasktypes;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.api.ButtonContext;
 import com.vincentmet.customquests.api.CombinedProgressHelper;
@@ -12,8 +11,8 @@ import com.vincentmet.customquests.api.ITaskType;
 import com.vincentmet.customquests.helpers.MouseButton;
 import com.vincentmet.customquests.helpers.PlayerBoundSubtaskReference;
 import com.vincentmet.customquests.hierarchy.quest.PredicateTexture;
+import com.vincentmet.customquests.messages.MessageCheckboxClick;
 import com.vincentmet.customquests.network.messages.PacketHandler;
-import com.vincentmet.customquests.standardcontent.messages.MessageCheckboxClick;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
@@ -25,7 +24,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class CheckboxTaskType implements ITaskType{
-	private static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(Constants.MODID, "checkbox");
+	private static final ResourceLocation ID = new ResourceLocation(Constants.MODID, "checkbox");
 	private static final Component TRANSLATION = Component.translatable(Constants.MODID + ".standardcontent.tasks.checkbox");
 	private static final Component TRANSLATION_SUBTASK = Component.translatable(Constants.MODID + ".standardcontent.tasks.checkbox.text_subtask");
 	public static final List<PlayerBoundSubtaskReference> TRACKING_LIST = new ArrayList<>();
@@ -65,7 +64,7 @@ public class CheckboxTaskType implements ITaskType{
 	
 	@Override
 	public IQuestingTexture getIcon(LocalPlayer playerEntity){
-		return new PredicateTexture(ResourceLocation.fromNamespaceAndPath("minecraft", "textures/gui/container/beacon.png"), 90, 222, 16, 16, 256, 256, ()->CombinedProgressHelper.isSubtaskCompleted(playerEntity.getUUID(), questId, taskId, subtaskId));
+		return new PredicateTexture(new ResourceLocation("minecraft", "textures/gui/container/beacon.png"), 90, 222, 16, 16, 256, 256, ()->CombinedProgressHelper.isSubtaskCompleted(playerEntity.getUUID(), questId, taskId, subtaskId));
 	}
 	
 	@Override
@@ -87,7 +86,7 @@ public class CheckboxTaskType implements ITaskType{
     public Consumer<MouseButton> onSlotClick(LocalPlayer player){
 		return (mouseButton)->{
 			if(!CombinedProgressHelper.isSubtaskCompleted(player.getUUID(), questId, taskId, subtaskId)){
-				PacketHandler.CHANNEL.sendToServer(new MessageCheckboxClick(questId, taskId, subtaskId));
+				PacketHandler.CHANNEL.sendToServer(new MessageCheckboxClick(questId, taskId, subtaskId)); //fixme networking for forge and fabric
 			}
 		};
     }

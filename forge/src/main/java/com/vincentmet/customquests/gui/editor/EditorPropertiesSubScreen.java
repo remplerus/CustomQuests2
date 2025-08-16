@@ -113,7 +113,7 @@ public class EditorPropertiesSubScreen implements IHoverRenderable, CQGuiEventLi
             removeTaskButton.render(matrixStack, mouseX, mouseY, partialTicks);
         }
         if(keyValueList.isEmpty()){
-            Minecraft.getInstance().font.draw(matrixStack, TRANSLATION_USE_SUBMENU, x.getAsInt()+5, y.getAsInt()+5, 0xFFFFFF);
+            matrixStack.drawString(Minecraft.getInstance().font, TRANSLATION_USE_SUBMENU, x.getAsInt()+5, y.getAsInt()+5, 0xFFFFFF);
         }
     }
     

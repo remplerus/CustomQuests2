@@ -1,11 +1,11 @@
 package com.vincentmet.customquests.hierarchy.quest;
 
 import com.google.gson.*;
-import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.CustomQuestsLogger;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.IJsonObjectProcessor;
+import com.vincentmet.customquests.api.IJsonObjectProvider;
 
-public class Reward implements IJsonObjectProcessor, IJsonObjectProvider{
+public class Reward implements IJsonObjectProcessor, IJsonObjectProvider {
 	private final int parentQuestId;
 	private final int rewardId;
 	private final SubRewards subRewards;

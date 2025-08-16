@@ -7,7 +7,11 @@ import com.vincentmet.customquests.hierarchy.party.Party;
 import com.vincentmet.customquests.hierarchy.party.SingleQuestPartyProgress;
 import com.vincentmet.customquests.hierarchy.progress.QuestingPlayer;
 import com.vincentmet.customquests.hierarchy.progress.SingleQuestUserProgress;
-import com.vincentmet.customquests.hierarchy.quest.*;
+import com.vincentmet.customquests.hierarchy.quest.Quest;
+import com.vincentmet.customquests.hierarchy.quest.Reward;
+import com.vincentmet.customquests.hierarchy.quest.SubReward;
+import com.vincentmet.customquests.hierarchy.quest.SubTask;
+import com.vincentmet.customquests.hierarchy.quest.Task;
 
 import java.util.UUID;
 

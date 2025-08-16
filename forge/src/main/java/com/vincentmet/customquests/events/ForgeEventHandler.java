@@ -3,11 +3,25 @@ package com.vincentmet.customquests.events;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.vincentmet.customquests.Config;
 import com.vincentmet.customquests.Constants;
-import com.vincentmet.customquests.ForgeBaseClass;
 import com.vincentmet.customquests.Objects;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.CQHelper;
+import com.vincentmet.customquests.api.CombinedProgressHelper;
+import com.vincentmet.customquests.api.PartyHelper;
+import com.vincentmet.customquests.api.ProgressHelper;
+import com.vincentmet.customquests.api.QuestHelper;
+import com.vincentmet.customquests.api.QuestingStorage;
+import com.vincentmet.customquests.api.ServerUtils;
 import com.vincentmet.customquests.helpers.PlayerBoundSubtaskReference;
-import com.vincentmet.customquests.standardcontent.tasktypes.*;
+import com.vincentmet.customquests.standardcontent.tasktypes.BiomeDetectTaskType;
+import com.vincentmet.customquests.standardcontent.tasktypes.BlockMinedTaskType;
+import com.vincentmet.customquests.standardcontent.tasktypes.BlockPlacedTaskType;
+import com.vincentmet.customquests.standardcontent.tasktypes.HuntTaskType;
+import com.vincentmet.customquests.standardcontent.tasktypes.ItemCraftTaskType;
+import com.vincentmet.customquests.standardcontent.tasktypes.ItemDetectTaskType;
+import com.vincentmet.customquests.standardcontent.tasktypes.ItemSubmitTaskType;
+import com.vincentmet.customquests.standardcontent.tasktypes.TravelTaskType;
+import com.vincentmet.customquests.standardcontent.tasktypes.XpDetectTaskType;
+import com.vincentmet.customquests.standardcontent.tasktypes.XpSubmitTaskType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -62,7 +76,7 @@ public class ForgeEventHandler{
 		if(Config.SidedConfig.giveDeviceOnFirstLogin()){
 			if(event.getEntity() instanceof ServerPlayer player){
 				if(player.getStats().getValue(Stats.CUSTOM.get(Stats.LEAVE_GAME)) == 0){
-					ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Objects.Items.QUESTING_DEVICE));
+					ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Objects.QUESTING_DEVICE.get()));
 				}
 			}
 		}
@@ -72,7 +86,7 @@ public class ForgeEventHandler{
 	public static void onWorldSave(LevelEvent.Save event){
 		//Main
 		if(event.getLevel() instanceof ServerLevel && event.getLevel().dimensionType().effectsLocation().equals(BuiltinDimensionTypes.OVERWORLD_EFFECTS)){
-			CQHelper.writeQuestsAndChaptersToFile(ForgeBaseClass.PATH_CONFIG, Constants.FILENAME_QUESTS + Constants.FILE_EXT_JSON);
+			CQHelper.writeQuestsAndChaptersToFile(Constants.PATH_CONFIG, Constants.FILENAME_QUESTS + Constants.FILE_EXT_JSON);
 			CQHelper.writePlayersAndPartiesToFile(Constants.currentProgressDirectory, Constants.FILENAME_PARTIES + Constants.FILE_EXT_JSON);
 		}
 	}

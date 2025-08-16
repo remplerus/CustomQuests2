@@ -1,9 +1,7 @@
 package com.vincentmet.customquests.gui.editor;
 
 import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.vincentmet.customquests.api.IQuestingTexture;
-import com.vincentmet.customquests.api.TextUtils;
 import com.vincentmet.customquests.gui.elements.ScrollableListEntry;
 import com.vincentmet.customquests.helpers.MouseButton;
 import com.vincentmet.customquests.helpers.math.Vec2i;

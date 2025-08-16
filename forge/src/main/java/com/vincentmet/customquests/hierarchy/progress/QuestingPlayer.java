@@ -2,19 +2,22 @@ package com.vincentmet.customquests.hierarchy.progress;
 
 import com.google.gson.*;
 import com.vincentmet.customquests.*;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.IJsonObjectProcessor;
+import com.vincentmet.customquests.api.IJsonObjectProvider;
+import com.vincentmet.customquests.api.QuestingStorage;
+
 import java.util.UUID;
 
-public class QuestingPlayer implements IJsonObjectProvider, IJsonObjectProcessor{
+public class QuestingPlayer implements IJsonObjectProvider, IJsonObjectProcessor {
 	private final UUID uuid;
 	private int party = -1;
 	private final UserProgress individualProgress;
-	
+
 	public QuestingPlayer(UUID uuid){
 		this.uuid = uuid;
 		this.individualProgress = new UserProgress(uuid);
 	}
-	
+
 	@Override
 	public void processJson(JsonObject json){
 		if(json.has("party")){
@@ -40,7 +43,7 @@ public class QuestingPlayer implements IJsonObjectProvider, IJsonObjectProcessor
 			if(Config.SidedConfig.isDebugModeOn()) CustomQuestsLogger.warn("'User > " + uuid.toString() + " > party': Not detected, defaulting to '-1'!");
 			setParty(-1);
 		}
-		
+
 		if(json.has("individual_progress")){
 			JsonElement jsonElement = json.get("individual_progress");
 			if(jsonElement.isJsonObject()){
@@ -55,7 +58,7 @@ public class QuestingPlayer implements IJsonObjectProvider, IJsonObjectProcessor
 			individualProgress.processJson(new JsonObject());
 		}
 	}
-	
+
 	@Override
 	public JsonObject getJson(){
 		JsonObject json = new JsonObject();
@@ -63,19 +66,19 @@ public class QuestingPlayer implements IJsonObjectProvider, IJsonObjectProcessor
 		json.add("individual_progress", individualProgress.getJson());
 		return json;
 	}
-	
+
 	public void deleteExcessValues(){
 		individualProgress.deleteExcessValues();
 	}
-	
+
 	public void generateMissingValues(){
 		individualProgress.generateMissingValues();
 	}
-	
+
 	public int getParty(){
 		return party;
 	}
-	
+
 	public void setParty(int party){
 		if(party>=0 && QuestingStorage.getSidedPartiesMap().containsKey(party)){
 			this.party = party;
@@ -83,15 +86,15 @@ public class QuestingPlayer implements IJsonObjectProvider, IJsonObjectProcessor
 			this.party = -1;
 		}
 	}
-	
+
 	public UserProgress getIndividualProgress(){
 		return individualProgress;
 	}
-	
+
 	public UUID getUuid(){
 		return uuid;
 	}
-	
+
 	@Override
 	public String toString(){
 		return "QuestingPlayer{" + "uuid=" + uuid + ", party=" + party + ", individualProgress=" + individualProgress + '}';

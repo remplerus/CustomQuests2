@@ -2,11 +2,16 @@ package com.vincentmet.customquests.hierarchy.party;
 
 import com.google.gson.*;
 import com.vincentmet.customquests.*;
-import com.vincentmet.customquests.api.*;
-import com.vincentmet.customquests.helpers.*;
+import com.vincentmet.customquests.api.IJsonObjectProcessor;
+import com.vincentmet.customquests.api.IJsonObjectProvider;
+import com.vincentmet.customquests.api.LogicType;
+import com.vincentmet.customquests.api.QuestingStorage;
+import com.vincentmet.customquests.helpers.BooleanContainer;
+import com.vincentmet.customquests.helpers.IntCounter;
+
 import java.util.*;
 
-public class SingleTaskPartyProgress extends HashMap<Integer, SingleSubtaskPartyProgress> implements IJsonObjectProcessor, IJsonObjectProvider{
+public class SingleTaskPartyProgress extends HashMap<Integer, SingleSubtaskPartyProgress> implements IJsonObjectProcessor, IJsonObjectProvider {
 	private boolean allSubtasksCompleted = false;
 	private final int partyId;
 	private final int questId;

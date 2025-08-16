@@ -5,7 +5,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.CustomQuestsLogger;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.CQRegistry;
+import com.vincentmet.customquests.api.EditorGuiHelper;
+import com.vincentmet.customquests.api.IJsonObjectProcessor;
+import com.vincentmet.customquests.api.IJsonObjectProvider;
+import com.vincentmet.customquests.api.LogicType;
 import com.vincentmet.customquests.gui.editor.EditorEntryWrapper;
 import com.vincentmet.customquests.gui.editor.IEditorEntry;
 import com.vincentmet.customquests.gui.editor.IEditorPage;
@@ -75,25 +79,25 @@ public class Tasks extends HashMap<Integer, Task> implements IJsonObjectProvider
 						JsonObject jsonObjectValue = value.getAsJsonObject();
 						if(!jsonObjectValue.has("type")){
 							CustomQuestsLogger.warn("'Quest > " + questId + " > tasks > entries > " + counter.getValue() + " > type': Not detected, defaulting to 'customquests:item_detect'!");
-							jsonObjectValue.addProperty("type", ResourceLocation.fromNamespaceAndPath(Constants.MODID, "item_detect").toString());
+							jsonObjectValue.addProperty("type", new ResourceLocation(Constants.MODID, "item_detect").toString());
 						}else{
 							JsonElement jsonElementType = jsonObjectValue.get("type");
 							if(!jsonElementType.isJsonPrimitive()){
 								CustomQuestsLogger.warn("'Quest > " + questId + " > tasks > entries > " + counter.getValue() + " > type': Value is not a JsonPrimitive, please use a String, defaulting to 'customquests:item_detect'!");
 								jsonObjectValue.remove("type");
-								jsonObjectValue.addProperty("type", ResourceLocation.fromNamespaceAndPath(Constants.MODID, "item_detect").toString());
+								jsonObjectValue.addProperty("type", new ResourceLocation(Constants.MODID, "item_detect").toString());
 							}else{
 								JsonPrimitive jsonPrimitiveType = jsonElementType.getAsJsonPrimitive();
 								if(!jsonPrimitiveType.isString()){
 									CustomQuestsLogger.warn("'Quest > " + questId + " > tasks > entries > " + counter.getValue() + " > type': Value is not a String, defaulting to 'customquests:item_detect'!");
 									jsonObjectValue.remove("type");
-									jsonObjectValue.addProperty("type", ResourceLocation.fromNamespaceAndPath(Constants.MODID, "item_detect").toString());
+									jsonObjectValue.addProperty("type", new ResourceLocation(Constants.MODID, "item_detect").toString());
 								}else{
 									String jsonStringType = jsonPrimitiveType.getAsString();
 									if(CQRegistry.getTaskTypes().keySet().stream().noneMatch(tasktypeId -> tasktypeId.toString().equals(jsonStringType))){
 										CustomQuestsLogger.warn("'Quest > " + questId + " > tasks > entries > " + counter.getValue() + " > type': Value does not match a registered TaskType, please download the addon mod it belongs to, or change it to something valid. Defaulting to 'customquests:item_detect'!");
 										jsonObjectValue.remove("type");
-										jsonObjectValue.addProperty("type", ResourceLocation.fromNamespaceAndPath(Constants.MODID, "item_detect").toString());
+										jsonObjectValue.addProperty("type", new ResourceLocation(Constants.MODID, "item_detect").toString());
 									}
 								}
 							}
@@ -160,7 +164,7 @@ public class Tasks extends HashMap<Integer, Task> implements IJsonObjectProvider
 
 	@Override
 	public void addPageEntries(List<IEditorEntry> list) {
-		list.add(new EditorEntryWrapper(Component.literal("Logic"), ResourceLocation.fromNamespaceAndPath(Constants.MODID, "plaintext"), () -> logicType.toString(), newValueObject -> {
+		list.add(new EditorEntryWrapper(Component.literal("Logic"), new ResourceLocation(Constants.MODID, "plaintext"), () -> logicType.toString(), newValueObject -> {
 			if (Arrays.stream(LogicType.values()).anyMatch(logicType1 -> logicType1.toString().equals(newValueObject.toString().toUpperCase()))){
 				setLogicType(LogicType.valueOf(newValueObject.toString().toUpperCase()));
 			}else{

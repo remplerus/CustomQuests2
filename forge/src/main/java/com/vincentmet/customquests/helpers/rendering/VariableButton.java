@@ -2,7 +2,6 @@ package com.vincentmet.customquests.helpers.rendering;
 
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.api.ApiUtils;
 import com.vincentmet.customquests.api.IHoverRenderable;
@@ -70,7 +69,7 @@ public class VariableButton implements IHoverRenderable, CQGuiEventListener {
 	public void renderHover(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks){
 		if(ApiUtils.isMouseInBounds(mouseX, mouseY, x.getAsInt(), y.getAsInt(), x.getAsInt()+width.getAsInt(), y.getAsInt()+height.getAsInt())){
 			TooltipBuffer.tooltipBuffer.add(()->{
-				Minecraft.getInstance().screen.renderComponentTooltip(matrixStack, tooltipLines, mouseX, mouseY);
+				matrixStack.renderComponentTooltip(TooltipBuffer.font, tooltipLines, mouseX, mouseY); //fixme render Tooltips
 			});
 		}
 		if(ApiUtils.isMouseInBounds(mouseX, mouseY, x.getAsInt(), y.getAsInt(), x.getAsInt()+width.getAsInt(), y.getAsInt()+height.getAsInt()) && texture == ButtonTexture.DEFAULT_NORMAL){
@@ -210,11 +209,11 @@ public class VariableButton implements IHoverRenderable, CQGuiEventListener {
 	}
 	
 	public static class ButtonTexture {
-		public static final ButtonTexture DEFAULT_NORMAL = new ButtonTexture(0, 0, 24, 24, 72, 72, 2, ResourceLocation.fromNamespaceAndPath(Constants.MODID, "textures/gui/button_square.png"));
-		public static final ButtonTexture DEFAULT_PRESSED = new ButtonTexture(24, 0, 24, 24, 72, 72, 2, ResourceLocation.fromNamespaceAndPath(Constants.MODID, "textures/gui/button_square.png"));
-		public static final ButtonTexture DEFAULT_DISABLED = new ButtonTexture(48, 0, 24, 24, 72, 72, 2, ResourceLocation.fromNamespaceAndPath(Constants.MODID, "textures/gui/button_square.png"));
-		public static final ButtonTexture DEFAULT_BLUE = new ButtonTexture(0, 24, 24, 24, 72, 72, 2, ResourceLocation.fromNamespaceAndPath(Constants.MODID, "textures/gui/button_square.png"));
-		public static final ButtonTexture DEFAULT_GREEN = new ButtonTexture(24, 24, 24, 24, 72, 72, 2, ResourceLocation.fromNamespaceAndPath(Constants.MODID, "textures/gui/button_square.png"));
+		public static final ButtonTexture DEFAULT_NORMAL = new ButtonTexture(0, 0, 24, 24, 72, 72, 2, new ResourceLocation(Constants.MODID, "textures/gui/button_square.png"));
+		public static final ButtonTexture DEFAULT_PRESSED = new ButtonTexture(24, 0, 24, 24, 72, 72, 2, new ResourceLocation(Constants.MODID, "textures/gui/button_square.png"));
+		public static final ButtonTexture DEFAULT_DISABLED = new ButtonTexture(48, 0, 24, 24, 72, 72, 2, new ResourceLocation(Constants.MODID, "textures/gui/button_square.png"));
+		public static final ButtonTexture DEFAULT_BLUE = new ButtonTexture(0, 24, 24, 24, 72, 72, 2, new ResourceLocation(Constants.MODID, "textures/gui/button_square.png"));
+		public static final ButtonTexture DEFAULT_GREEN = new ButtonTexture(24, 24, 24, 24, 72, 72, 2, new ResourceLocation(Constants.MODID, "textures/gui/button_square.png"));
 		private final ResourceLocation texture;
 		private final int u;
 		private final int v;

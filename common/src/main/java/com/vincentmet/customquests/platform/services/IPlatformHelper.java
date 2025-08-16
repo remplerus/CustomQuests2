@@ -1,5 +1,10 @@
 package com.vincentmet.customquests.platform.services;
 
+import com.vincentmet.customquests.helpers.DeferredRegistryObject;
+import net.minecraft.core.Registry;
+
+import java.util.function.Supplier;
+
 public interface IPlatformHelper {
 
     /**
@@ -33,4 +38,6 @@ public interface IPlatformHelper {
 
         return isDevelopmentEnvironment() ? "development" : "production";
     }
+
+    <T, U extends T> DeferredRegistryObject<U> register(Registry<T> objectRegistry, String name, Supplier<U> object);
 }

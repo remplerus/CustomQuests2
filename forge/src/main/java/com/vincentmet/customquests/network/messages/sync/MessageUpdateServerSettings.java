@@ -1,10 +1,8 @@
 package com.vincentmet.customquests.network.messages.sync;
 
-import com.google.common.base.Suppliers;
 import com.vincentmet.customquests.Config;
 import com.vincentmet.customquests.network.messages.ICQPacket;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.fml.util.thread.EffectiveSide;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;

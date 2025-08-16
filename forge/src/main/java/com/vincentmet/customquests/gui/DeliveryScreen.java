@@ -1,5 +1,6 @@
 package com.vincentmet.customquests.gui;
 
+import com.mojang.blaze3d.platform.Window;
 import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.api.CombinedProgressHelper;
 import com.vincentmet.customquests.api.QuestHelper;
@@ -13,9 +14,6 @@ import com.vincentmet.customquests.helpers.Triple;
 import com.vincentmet.customquests.helpers.math.Vec2i;
 import com.vincentmet.customquests.helpers.rendering.VariableButton;
 import com.vincentmet.customquests.helpers.rendering.VariableSlot;
-import com.vincentmet.customquests.network.messages.PacketHandler;
-import com.vincentmet.customquests.network.messages.sync.MessageUpdateDelivery;
-import com.vincentmet.customquests.block.blockentity.DeliveryBlockBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -107,7 +105,7 @@ public class DeliveryScreen extends Screen {
 		QuestingStorage.getSidedQuestsMap().entrySet()
 		                                 .stream()
 		                                 .filter(entry->entry.getValue().hasChapter())
-		                                 .filter(entry -> entry.getValue().getTasks().entrySet().stream().anyMatch(entry1 -> entry1.getValue().getTaskType().toString().equals(ResourceLocation.fromNamespaceAndPath(Constants.MODID, "item_submit").toString())))
+		                                 .filter(entry -> entry.getValue().getTasks().entrySet().stream().anyMatch(entry1 -> entry1.getValue().getTaskType().toString().equals(new ResourceLocation(Constants.MODID, "item_submit").toString())))
 		                                 .filter(entry -> CombinedProgressHelper.isQuestUnlocked(clientPlayer.getUUID(), entry.getKey()) && !CombinedProgressHelper.isQuestCompleted(clientPlayer.getUUID(), entry.getKey()))
 		                                 .forEach(entry -> {
 			                                 List<Component> tooltips = new ArrayList<>();
@@ -131,7 +129,7 @@ public class DeliveryScreen extends Screen {
 			               .stream()
 			               .filter(entry->QuestHelper.getQuestFromId(currentSubtask.getLeft()).hasChapter())
 			               .filter(entry -> !CombinedProgressHelper.isTaskCompleted(clientPlayer.getUUID(), currentSubtask.getLeft(), entry.getKey()))
-			               .filter(entry -> entry.getValue().getTaskType().toString().equals(ResourceLocation.fromNamespaceAndPath(Constants.MODID, "item_submit").toString()))
+			               .filter(entry -> entry.getValue().getTaskType().toString().equals(new ResourceLocation(Constants.MODID, "item_submit").toString()))
 					       .forEach(entry->{
 						       taskList.add(new TextButton(taskListX, ()->cumulativeHeight.getValue(), ()->(width>>2) - 20, MENUS_BUTTON_HEIGHT, entry.getKey().toString(), ButtonState.NORMAL, (mouseButton) -> {
 							       currentSubtask.setM(entry.getKey());
@@ -155,12 +153,13 @@ public class DeliveryScreen extends Screen {
 				                   currentSubtask.setR(entry.getKey());
 			                   	   selectButton.setOnClickCallback((mouseButton) -> {
 				                       BlockEntity te = clientPlayer.level().getBlockEntity(tilePos);
-			                   	       if(te instanceof DeliveryBlockBlockEntity dbte){
-                                           if(dbte.getItemHandler() != null){
-				                               dbte.getItemHandler().setActiveSubtask(currentSubtask.getLeft(), currentSubtask.getMiddle(), currentSubtask.getRight());
-				                               PacketHandler.CHANNEL.sendToServer(new MessageUpdateDelivery(tilePos, currentSubtask.getLeft(), currentSubtask.getMiddle(), currentSubtask.getRight()));
-			                               }
-			                   	       }
+									   //fixme when DELIVERY_BLOCK is implemented
+			                   	       //if(te instanceof DeliveryBlockBlockEntity dbte){
+                                       //    if(dbte.getItemHandler() != null){
+				                       //        dbte.getItemHandler().setActiveSubtask(currentSubtask.getLeft(), currentSubtask.getMiddle(), currentSubtask.getRight());
+				                       //        PacketHandler.CHANNEL.sendToServer(new MessageUpdateDelivery(tilePos, currentSubtask.getLeft(), currentSubtask.getMiddle(), currentSubtask.getRight()));
+			                           //    }
+			                   	       //}
 			                       });
 			                   }, new ArrayList<>()));
 				               cumulativeHeight.count();
@@ -174,19 +173,19 @@ public class DeliveryScreen extends Screen {
 	public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
 		TooltipBuffer.tooltipBuffer.clear();
 		renderBackgrounds(matrixStack);
-		font.drawShadow(matrixStack, TRANSLATION_QUEST.getString() + ":", questListX.getAsInt(), questListY.getAsInt() - font.lineHeight, 0xFFFFFF);
+		matrixStack.drawString(font, TRANSLATION_QUEST.getString() + ":", questListX.getAsInt(), questListY.getAsInt() - font.lineHeight, 0xFFFFFF);
 		questsList.render(matrixStack, mouseX, mouseY, partialTicks);
-		font.drawShadow(matrixStack, TRANSLATION_TASK.getString() + ":", (Minecraft.getInstance().getWindow().getGuiScaledWidth()>>2)+10, 20 - font.lineHeight, 0xFFFFFF);
+		matrixStack.drawString(font, TRANSLATION_TASK.getString() + ":", (Minecraft.getInstance().getWindow().getGuiScaledWidth()>>2)+10, 20 - font.lineHeight, 0xFFFFFF);
 		taskList.render(matrixStack, mouseX, mouseY, partialTicks);
-		
-		font.drawShadow(matrixStack, TRANSLATION_SUBTASK.getString() + ":", (width>>2)+10, height / 2 + 10 - font.lineHeight, 0xFFFFFF);
+
+		matrixStack.drawString(font, TRANSLATION_SUBTASK.getString() + ":", (width>>2)+10, height / 2 + 10 - font.lineHeight, 0xFFFFFF);
 		subtaskList.render(matrixStack, mouseX, mouseY, partialTicks);
 		
 		if(currentSubtask.getLeft()>=0 && currentSubtask.getMiddle()>=0 && currentSubtask.getRight()>=0){
 			selectButton.render(matrixStack, mouseX, mouseY, partialTicks);
 			String title = QuestingStorage.getSidedQuestsMap().get(currentSubtask.getLeft()) != null ? QuestingStorage.getSidedQuestsMap().get(currentSubtask.getLeft()).getTitle().toString() : "";
-			font.drawShadow(matrixStack, title, (int)(width * 0.75) - (font.width(title) >> 1), 30, 0xFFFFFF);
-			font.drawShadow(matrixStack, TRANSLATION_ITEMS_TO_HAND_IN.getString(), (width >> 1) + 25, 40, 0xFFFFFF);
+			matrixStack.drawString(font, title, (int)(width * 0.75) - (font.width(title) >> 1), 30, 0xFFFFFF);
+			matrixStack.drawString(font, TRANSLATION_ITEMS_TO_HAND_IN.getString(), (width >> 1) + 25, 40, 0xFFFFFF);
 			selectSlot.render(matrixStack, mouseX, mouseY, partialTicks);
 			
 			boolean isCompleted = QuestingStorage.getSidedPlayersMap().get(clientPlayer.getStringUUID()).getIndividualProgress().get(currentSubtask.getLeft()).get(currentSubtask.getMiddle()).get(currentSubtask.getRight()).getValue() == QuestingStorage.getSidedQuestsMap().get(currentSubtask.getLeft()).getTasks().get(currentSubtask.getMiddle()).getSubtasks().get(currentSubtask.getRight()).getSubtask().getCompletionAmount();
@@ -194,11 +193,12 @@ public class DeliveryScreen extends Screen {
 			if(isCompleted)
 				checkmarkText = ChatFormatting.GREEN + " \u2713";
 			String subtaskText = QuestingStorage.getSidedQuestsMap().get(currentSubtask.getLeft()).getTasks().get(currentSubtask.getMiddle()).getSubtasks().get(currentSubtask.getRight()).getSubtask().getText(clientPlayer) + checkmarkText;
-			if(Minecraft.getInstance().font.width(subtaskText) + 5 >= (Minecraft.getInstance().getWindow().getGuiScaledWidth()>>1) - 90){
-				subtaskText = Minecraft.getInstance().font.split(Component.literal(subtaskText), (Minecraft.getInstance().getWindow().getGuiScaledWidth() >> 1) - 90) + "...";//todo test this split function
+			Window window = Minecraft.getInstance().getWindow();
+			if(font.width(subtaskText) + 5 >= (window.getGuiScaledWidth()>>1) - 90){
+				subtaskText = font.split(Component.literal(subtaskText), (window.getGuiScaledWidth() >> 1) - 90) + "...";//todo test this split function
 			}
-			Minecraft.getInstance().font.drawShadow(matrixStack, subtaskText, 27 + (Minecraft.getInstance().getWindow().getGuiScaledWidth() >> 1) + 25, 55 + 10 - Minecraft.getInstance().font.lineHeight / 2, 0xFFFFFF);
-			QuestingStorage.getSidedQuestsMap().get(currentSubtask.getLeft()).getTasks().get(currentSubtask.getMiddle()).getSubtasks().get(currentSubtask.getRight()).getSubtask().getIcon(clientPlayer).render(matrixStack, 1, (Minecraft.getInstance().getWindow().getGuiScaledWidth() >> 1) + 25 + 1, 55 + 1, 0, 0, mouseX, mouseY);
+			matrixStack.drawString(font, subtaskText, 27 + (window.getGuiScaledWidth() >> 1) + 25, 55 + 10 - Minecraft.getInstance().font.lineHeight / 2, 0xFFFFFF);
+			QuestingStorage.getSidedQuestsMap().get(currentSubtask.getLeft()).getTasks().get(currentSubtask.getMiddle()).getSubtasks().get(currentSubtask.getRight()).getSubtask().getIcon(clientPlayer).render(matrixStack, 1, (window.getGuiScaledWidth() >> 1) + 25 + 1, 55 + 1, 0, 0, mouseX, mouseY);
 		}
 		TooltipBuffer.tooltipBuffer.forEach(Runnable::run);
 	}

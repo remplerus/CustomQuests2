@@ -2,7 +2,6 @@ package com.vincentmet.customquests.network.messages.editor.cts.requests.update.
 
 import com.vincentmet.customquests.api.ApiUtils;
 import com.vincentmet.customquests.api.EditorServerProcessor;
-import com.vincentmet.customquests.api.LogicType;
 import com.vincentmet.customquests.api.QuestHelper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;

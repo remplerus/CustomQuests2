@@ -1,8 +1,7 @@
-package com.vincentmet.customquests.standardcontent.messages;
+package com.vincentmet.customquests.messages;
 
 import com.vincentmet.customquests.api.CombinedProgressHelper;
 import com.vincentmet.customquests.network.messages.ICQPacket;
-import com.vincentmet.customquests.network.messages.sync.MessageUpdateSinglePlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 

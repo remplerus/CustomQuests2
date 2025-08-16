@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.regex.Pattern;
 
 public class IntegerFieldType implements IEditorEntryDataType {
-    private final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(Constants.MODID, "integer");
+    private final ResourceLocation ID = new ResourceLocation(Constants.MODID, "integer");
     private SingleLineTextField rlValue;
     private Object initialValue;
     

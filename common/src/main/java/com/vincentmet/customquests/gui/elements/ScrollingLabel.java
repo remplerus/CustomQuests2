@@ -1,6 +1,5 @@
 package com.vincentmet.customquests.gui.elements;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.vincentmet.customquests.api.IRenderable;
 import com.vincentmet.customquests.helpers.rendering.GLScissorStack;
 import net.minecraft.client.Minecraft;
@@ -44,9 +43,9 @@ public class ScrollingLabel implements IRenderable{
             }else{
                 localOffsetPause = Math.min(currentOffset - beginEndPauseDuration, maxOffset);
             }
-            FONT.drawShadow(matrixStack, text, x.getAsInt()-localOffsetPause, y.getAsInt(), 0xFFFFFF);//stack, text, x, y, color
+            matrixStack.drawString(FONT, text, x.getAsInt()-localOffsetPause, y.getAsInt(), 0xFFFFFF);//stack, text, x, y, color
         }else{
-            FONT.drawShadow(matrixStack, text, x.getAsInt(), y.getAsInt(), 0xFFFFFF);//stack, text, x, y, color
+            matrixStack.drawString(FONT, text, x.getAsInt(), y.getAsInt(), 0xFFFFFF);//stack, text, x, y, color
         }
         GLScissorStack.pop(matrixStack);
     }

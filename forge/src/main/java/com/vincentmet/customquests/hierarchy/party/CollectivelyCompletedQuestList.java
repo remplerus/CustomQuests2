@@ -2,11 +2,12 @@ package com.vincentmet.customquests.hierarchy.party;
 
 import com.google.gson.*;
 import com.vincentmet.customquests.*;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.IJsonArrayProcessor;
+import com.vincentmet.customquests.api.IJsonArrayProvider;
 import com.vincentmet.customquests.helpers.IntCounter;
 import java.util.*;
 
-public class CollectivelyCompletedQuestList extends HashSet<Integer> implements IJsonArrayProcessor, IJsonArrayProvider{
+public class CollectivelyCompletedQuestList extends HashSet<Integer> implements IJsonArrayProcessor, IJsonArrayProvider {
 	private final int parentPartyId;
 	
 	public CollectivelyCompletedQuestList(int parentPartyId){

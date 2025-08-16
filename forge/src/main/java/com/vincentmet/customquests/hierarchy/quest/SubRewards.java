@@ -2,7 +2,6 @@ package com.vincentmet.customquests.hierarchy.quest;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.CustomQuestsLogger;
 import com.vincentmet.customquests.api.IJsonObjectProcessor;
 import com.vincentmet.customquests.api.IJsonObjectProvider;

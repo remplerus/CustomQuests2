@@ -134,11 +134,11 @@ public class Position extends Vec2i implements IJsonObjectProvider, IJsonObjectP
 
 	@Override
 	public void addPageEntries(List<IEditorEntry> list) {
-		list.add(new EditorEntryWrapper(Component.literal("X"), ResourceLocation.fromNamespaceAndPath(Constants.MODID, "integer"), this::getX, newValueObject -> {
+		list.add(new EditorEntryWrapper(Component.literal("X"), new ResourceLocation(Constants.MODID, "integer"), this::getX, newValueObject -> {
 			setX(Integer.parseInt(newValueObject.toString()));
 			EditorGuiHelper.Update.Quest.Position.requestUpdatePositionX(parentQuestId, getX());
 		}));
-		list.add(new EditorEntryWrapper(Component.literal("Y"), ResourceLocation.fromNamespaceAndPath(Constants.MODID, "integer"), this::getY, newValueObject -> {
+		list.add(new EditorEntryWrapper(Component.literal("Y"), new ResourceLocation(Constants.MODID, "integer"), this::getY, newValueObject -> {
 			setY(Integer.parseInt(newValueObject.toString()));
 			EditorGuiHelper.Update.Quest.Position.requestUpdatePositionY(parentQuestId, getY());
 		}));

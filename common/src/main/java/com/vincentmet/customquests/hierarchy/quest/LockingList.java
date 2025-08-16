@@ -1,19 +1,20 @@
 package com.vincentmet.customquests.hierarchy.quest;
 
 import com.google.gson.*;
-import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.CustomQuestsLogger;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.IJsonArrayProcessor;
+import com.vincentmet.customquests.api.IJsonArrayProvider;
+
 import java.util.HashSet;
 
-public class UnlockingList extends HashSet<Integer> implements IJsonArrayProcessor, IJsonArrayProvider{
+public class LockingList extends HashSet<Integer> implements IJsonArrayProcessor, IJsonArrayProvider {
 	private final int parentQuestId;
 	
-	public UnlockingList(int parentQuestId){
+	public LockingList(int parentQuestId){
 		this.parentQuestId = parentQuestId;
 	}
 	
-	public UnlockingList add(int id){
+	public LockingList add(int id){
 		if(id >= 0){
 			super.add(id);
 		}
@@ -31,10 +32,10 @@ public class UnlockingList extends HashSet<Integer> implements IJsonArrayProcess
 					int jsonEntriesPrimitiveIntValue = jsonEntriesPrimitive.getAsInt();
 					add(jsonEntriesPrimitiveIntValue);
 				}else{
-					CustomQuestsLogger.warn("Value for one of the entries for Json key 'unlocks' for quest " + parentQuestId + " is not an int, please use an Integer, discarding it for now!");
+					CustomQuestsLogger.warn("Value for one of the entries for Json key 'locks' for quest " + parentQuestId + " is not an int, please use an Integer, discarding it for now!");
 				}
 			}else{
-				CustomQuestsLogger.warn("Value for one of the entries for Json key 'unlocks' for quest " + parentQuestId + " is not a Primitive, please use an Integer, discarding it for now!");
+				CustomQuestsLogger.warn("Value for one of the entries for Json key 'locks' for quest " + parentQuestId + " is not a Primitive, please use an Integer, discarding it for now!");
 			}
 		}
 	}

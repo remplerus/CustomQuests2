@@ -6,7 +6,6 @@ import com.google.gson.JsonParser;
 import com.vincentmet.customquests.Config;
 import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.CustomQuestsLogger;
-import com.vincentmet.customquests.ForgeBaseClass;
 import com.vincentmet.customquests.hierarchy.chapter.Chapter;
 import com.vincentmet.customquests.hierarchy.party.Party;
 import com.vincentmet.customquests.hierarchy.progress.QuestingPlayer;
@@ -209,8 +208,8 @@ public class CQHelper{
 		QuestingStorage.getSidedChaptersMap().clear();
 		QuestingStorage.getSidedPartiesMap().clear();
 		QuestingStorage.getSidedPlayersMap().clear();
-		QuestingStorage.getSidedQuestsMap().putAll(CQHelper.getQuestsMap(CQHelper.getQuestsJsonFromFile(ForgeBaseClass.PATH_CONFIG, Constants.FILENAME_QUESTS + Constants.FILE_EXT_JSON)));
-		QuestingStorage.getSidedChaptersMap().putAll(CQHelper.getChaptersMap(CQHelper.getChaptersJsonFromFile(ForgeBaseClass.PATH_CONFIG, Constants.FILENAME_QUESTS + Constants.FILE_EXT_JSON)));
+		QuestingStorage.getSidedQuestsMap().putAll(CQHelper.getQuestsMap(CQHelper.getQuestsJsonFromFile(Constants.PATH_CONFIG, Constants.FILENAME_QUESTS + Constants.FILE_EXT_JSON)));
+		QuestingStorage.getSidedChaptersMap().putAll(CQHelper.getChaptersMap(CQHelper.getChaptersJsonFromFile(Constants.PATH_CONFIG, Constants.FILENAME_QUESTS + Constants.FILE_EXT_JSON)));
 		QuestingStorage.getSidedPartiesMap().putAll(CQHelper.getPartiesMap(CQHelper.getPartiesJsonFromFile(Constants.currentProgressDirectory, Constants.FILENAME_PARTIES + Constants.FILE_EXT_JSON)));
 		QuestingStorage.getSidedPlayersMap().putAll(CQHelper.getPlayersMap(CQHelper.getPlayersJsonFromFile(Constants.currentProgressDirectory, Constants.FILENAME_PARTIES + Constants.FILE_EXT_JSON)));
 	}

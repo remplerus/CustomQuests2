@@ -3,7 +3,6 @@ package com.vincentmet.customquests.network.messages.sync.stc.delete;
 import com.vincentmet.customquests.api.ClientUtils;
 import com.vincentmet.customquests.api.EditorClientProcessor;
 import com.vincentmet.customquests.network.messages.ICQPacket;
-import com.vincentmet.customquests.network.messages.sync.MessageUpdateSinglePlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 

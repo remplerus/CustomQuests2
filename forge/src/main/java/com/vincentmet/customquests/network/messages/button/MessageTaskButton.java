@@ -2,7 +2,6 @@ package com.vincentmet.customquests.network.messages.button;
 
 import com.vincentmet.customquests.api.ProgressHelper;
 import com.vincentmet.customquests.network.messages.ICQPacket;
-import com.vincentmet.customquests.network.messages.sync.MessageUpdateDelivery;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 

@@ -1,13 +1,13 @@
 package com.vincentmet.customquests.hierarchy.progress;
 
 import com.google.gson.*;
-import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.CustomQuestsLogger;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.IJsonArrayProcessor;
+import com.vincentmet.customquests.api.IJsonArrayProvider;
 import com.vincentmet.customquests.helpers.IntCounter;
 import java.util.*;
 
-public class IndividuallyCompletedQuestList extends  HashSet<Integer> implements IJsonArrayProvider, IJsonArrayProcessor{
+public class IndividuallyCompletedQuestList extends  HashSet<Integer> implements IJsonArrayProvider, IJsonArrayProcessor {
 	private final UUID uuid;
 	
 	public IndividuallyCompletedQuestList(UUID uuid){

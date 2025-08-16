@@ -3,7 +3,6 @@ package com.vincentmet.customquests.standardcontent.rewardtypes;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.CustomQuestsLogger;
 import com.vincentmet.customquests.api.IRewardType;
@@ -17,7 +16,7 @@ import net.minecraft.world.item.Items;
 import java.util.function.Consumer;
 
 public class XpRewardType implements IRewardType{
-	private static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(Constants.MODID, "xp");
+	private static final ResourceLocation ID = new ResourceLocation(Constants.MODID, "xp");
 	private boolean inLevels = false;
 	private int amount = 0;
 	

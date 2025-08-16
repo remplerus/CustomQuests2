@@ -128,7 +128,7 @@ public class SubTasks extends HashMap<Integer, SubTask> implements IJsonObjectPr
 
 	@Override
 	public void addPageEntries(List<IEditorEntry> list) {
-		list.add(new EditorEntryWrapper(Component.literal("Logic"), ResourceLocation.fromNamespaceAndPath(Constants.MODID, "plaintext"), () -> logicType.toString(), newValueObject -> {
+		list.add(new EditorEntryWrapper(Component.literal("Logic"), new ResourceLocation(Constants.MODID, "plaintext"), () -> logicType.toString(), newValueObject -> {
 			if (Arrays.stream(LogicType.values()).anyMatch(logicType1 -> logicType1.toString().equals(newValueObject.toString().toUpperCase()))){
 				setLogicType(LogicType.valueOf(newValueObject.toString().toUpperCase()));
 			}else{

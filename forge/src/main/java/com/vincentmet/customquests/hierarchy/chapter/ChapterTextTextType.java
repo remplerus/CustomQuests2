@@ -5,7 +5,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.CustomQuestsLogger;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.CQRegistry;
+import com.vincentmet.customquests.api.EditorGuiHelper;
+import com.vincentmet.customquests.api.IJsonObjectProcessor;
+import com.vincentmet.customquests.api.IJsonObjectProvider;
+import com.vincentmet.customquests.api.ITextType;
 import com.vincentmet.customquests.gui.editor.EditorEntryWrapper;
 import com.vincentmet.customquests.gui.editor.IEditorEntry;
 import com.vincentmet.customquests.gui.editor.IEditorPage;
@@ -111,11 +115,11 @@ public class ChapterTextTextType implements IJsonObjectProcessor, IJsonObjectPro
 
     @Override
     public void addPageEntries(List<IEditorEntry> list) {
-        list.add(new EditorEntryWrapper(Component.literal("Type"), ResourceLocation.fromNamespaceAndPath(Constants.MODID, "resourcelocation"), () -> type.getId().toString(), newValueObject -> {
+        list.add(new EditorEntryWrapper(Component.literal("Type"), new ResourceLocation(Constants.MODID, "resourcelocation"), () -> type.getId().toString(), newValueObject -> {
             setType(ResourceLocation.tryParse(newValueObject.toString()));
             EditorGuiHelper.Update.Chapter.Text.requestUpdateType(parentId, getType().getId());
         }));
-        list.add(new EditorEntryWrapper(Component.literal("Text"), ResourceLocation.fromNamespaceAndPath(Constants.MODID, "plaintext"), () -> type.getOgText(), newValueObject -> {
+        list.add(new EditorEntryWrapper(Component.literal("Text"), new ResourceLocation(Constants.MODID, "plaintext"), () -> type.getOgText(), newValueObject -> {
             setText(newValueObject.toString());
             EditorGuiHelper.Update.Chapter.Text.requestUpdateText(parentId, getOgText());
         }));

@@ -1,14 +1,30 @@
 package com.vincentmet.customquests.gui.elements.impl;
 
 import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.vincentmet.customquests.Constants;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.ApiUtils;
+import com.vincentmet.customquests.api.ButtonContext;
+import com.vincentmet.customquests.api.CQRegistry;
+import com.vincentmet.customquests.api.CombinedProgressHelper;
+import com.vincentmet.customquests.api.ICurrentItemStackProvider;
+import com.vincentmet.customquests.api.IHoverRenderable;
+import com.vincentmet.customquests.api.IItemStacksProvider;
+import com.vincentmet.customquests.api.IRewardType;
+import com.vincentmet.customquests.api.ITaskType;
+import com.vincentmet.customquests.api.LogicType;
+import com.vincentmet.customquests.api.QuestHelper;
+import com.vincentmet.customquests.api.QuestingStorage;
 import com.vincentmet.customquests.gui.QuestingScreenManager;
 import com.vincentmet.customquests.gui.elements.ButtonState;
 import com.vincentmet.customquests.gui.elements.QuadOutline;
 import com.vincentmet.customquests.gui.elements.ScrollingLabel;
-import com.vincentmet.customquests.helpers.*;
+import com.vincentmet.customquests.helpers.CQGuiEventListener;
+import com.vincentmet.customquests.helpers.Container;
+import com.vincentmet.customquests.helpers.IntCounter;
+import com.vincentmet.customquests.helpers.Octuple;
+import com.vincentmet.customquests.helpers.Quintuple;
+import com.vincentmet.customquests.helpers.TooltipBuffer;
+import com.vincentmet.customquests.helpers.Triple;
 import com.vincentmet.customquests.helpers.math.Vec2i;
 import com.vincentmet.customquests.helpers.rendering.GLScissorStack;
 import com.vincentmet.customquests.helpers.rendering.VariableButton;
@@ -294,7 +310,7 @@ public class QuestDetails implements IHoverRenderable, CQGuiEventListener {
 	private void renderText(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks){
 		GLScissorStack.push(matrixStack, textContentX.getAsInt(), textContentY.getAsInt(), textContentWidth.getAsInt(), textContentHeight.getAsInt());
 		textToRender.forEach(triple->{
-			FONT.draw(matrixStack, triple.getLeft(), triple.getMiddle(), triple.getRight(), 0xFFFFFF);//renderString
+			matrixStack.drawString(FONT, triple.getLeft(), triple.getMiddle(), triple.getRight(), 0xFFFFFF);//renderString
 		});
 		GLScissorStack.pop(matrixStack);
 	}
@@ -340,13 +356,13 @@ public class QuestDetails implements IHoverRenderable, CQGuiEventListener {
 		Lighting.setupFor3DItems();
 		rewardItemsToRender.forEach(quad -> {
 			if(quad.getLeft() instanceof IItemStacksProvider){
-				Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(((IItemStacksProvider)quad.getLeft()).getItemStacks().get(0), quad.getMiddle(), quad.getRight());
+				matrixStack.renderItemDecorations(TooltipBuffer.font, ((IItemStacksProvider)quad.getLeft()).getItemStacks().get(0), quad.getMiddle(), quad.getRight());
 			}else{
-				Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(new ItemStack(quad.getLeft().getIcon()), quad.getMiddle(), quad.getRight());
+                matrixStack.renderItemDecorations(TooltipBuffer.font, new ItemStack(quad.getLeft().getIcon()), quad.getMiddle(), quad.getRight());
 			}
 		});
 		rewardTextToRender.forEach(scrollingLabel -> scrollingLabel.render(matrixStack, mouseX, mouseY, partialTicks));
-		FONT.drawShadow(matrixStack, Component.translatable(Constants.MODID + ".screens.rewards").getString(), rewardContentX.getAsInt(), rewardContentY.getAsInt()-rewardScrollDistance, 0xFFFFFF);
+		matrixStack.drawString(FONT, Component.translatable(Constants.MODID + ".screens.rewards").getString(), rewardContentX.getAsInt(), rewardContentY.getAsInt()-rewardScrollDistance, 0xFFFFFF);
 		rewardSelectionOutlinesToRender.forEach(quadOutline -> quadOutline.render(matrixStack, mouseX, mouseY, partialTicks));
 		claimRewardButton.render(matrixStack, mouseX, mouseY, partialTicks);
 		GLScissorStack.pop(matrixStack);

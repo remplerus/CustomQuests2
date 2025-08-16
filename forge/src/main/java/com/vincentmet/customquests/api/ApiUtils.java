@@ -9,7 +9,7 @@ import net.minecraft.nbt.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
-public class ApiUtils{
+public class ApiUtils {
 	//Just to not worry about the errors, it'll fall back to the default item NBT if it fails
 	public static CompoundTag getNbtFromJson(String jsonString){
 		if (jsonString!=null){
@@ -63,7 +63,7 @@ public class ApiUtils{
 	}
 	
 	public static void backupData(){
-		File oldFile = ForgeBaseClass.PATH_CONFIG.resolve(Constants.FILENAME_QUESTS+ Constants.FILE_EXT_JSON).toFile();
+		File oldFile = Constants.PATH_CONFIG.resolve(Constants.FILENAME_QUESTS+ Constants.FILE_EXT_JSON).toFile();
 		Path newPath = Constants.questsBackupDirectory;
 		File newFile = new File(Constants.FILENAME_QUESTS + "_" + getLocalFormattedTime() + Constants.FILE_EXT_JSON);
 		try{

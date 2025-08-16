@@ -2,10 +2,13 @@ package com.vincentmet.customquests.hierarchy.party;
 
 import com.google.gson.*;
 import com.vincentmet.customquests.*;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.IJsonObjectProcessor;
+import com.vincentmet.customquests.api.IJsonObjectProvider;
+import com.vincentmet.customquests.api.PartyHelper;
+
 import java.util.UUID;
 
-public class Party implements IJsonObjectProvider, IJsonObjectProcessor{
+public class Party implements IJsonObjectProvider, IJsonObjectProcessor {
 	private final int id;
 	private String name = "";
 	private UUID owner;

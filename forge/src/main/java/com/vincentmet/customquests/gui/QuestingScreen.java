@@ -112,7 +112,7 @@ public class QuestingScreen extends Screen {
 				screenManager.setCurrentlySelectedChapterId(chapter.getId());
 				questingCanvas.applyDraggingLimits();
 				questingCanvas.reInit(questingCanvasX.getAsInt(), questingCanvasY.getAsInt(), questingCanvasWidth.getAsInt(), questingCanvasHeight.getAsInt());
-				localPlayer.playSound(QuestingStorage.SOUNDS.get("chapter" + chapterID), 1, 1);
+				localPlayer.playSound(QuestingStorage.SOUNDS.get("quest0"), 1, 1);
 			}, chapterInfoList));
 			cumulativeHeight.count();
 		});
@@ -161,7 +161,7 @@ public class QuestingScreen extends Screen {
 			
 			//Show message if there are no quests loaded
 			if(QuestingStorage.getSidedQuestsMap().isEmpty()){
-				Minecraft.getInstance().font.drawShadow(matrixStack, localization_noQuests.getString(), questingCanvas.getX() + 5, questingCanvas.getY() + 5, 0xFFFFFF);
+				matrixStack.drawString(font, localization_noQuests.getString(), questingCanvas.getX() + 5, questingCanvas.getY() + 5, 0xFFFFFF);
 			}
 		}
 		TooltipBuffer.tooltipBuffer.forEach(Runnable::run);

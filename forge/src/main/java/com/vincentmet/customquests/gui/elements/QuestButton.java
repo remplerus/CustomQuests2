@@ -65,7 +65,7 @@ public class QuestButton implements MovableScalableCanvasEntry{
 	public void renderHover(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks){
 		if(ApiUtils.isMouseInBounds(mouseX, mouseY, parentX + x, parentY + y, parentX + x + (int)(buttonState.WIDTH * buttonScale), parentY + y + (int)(buttonState.HEIGHT * buttonScale))){
 			TooltipBuffer.tooltipBuffer.add(()->{
-				if(Minecraft.getInstance().screen != null) Minecraft.getInstance().screen.renderComponentTooltip(matrixStack, tooltipLines, mouseX, mouseY);
+				if(Minecraft.getInstance().screen != null) matrixStack.renderComponentTooltip(TooltipBuffer.font, tooltipLines, mouseX, mouseY); //fixme render tooltips
 			});
 		}
 	}

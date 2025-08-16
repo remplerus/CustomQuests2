@@ -3,16 +3,25 @@ package com.vincentmet.customquests.standardcontent.tasktypes;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.CustomQuestsLogger;
-import com.vincentmet.customquests.api.*;
-import com.vincentmet.customquests.helpers.*;
+import com.vincentmet.customquests.api.ApiUtils;
+import com.vincentmet.customquests.api.ButtonContext;
+import com.vincentmet.customquests.api.CombinedProgressHelper;
+import com.vincentmet.customquests.api.IItemStacksProvider;
+import com.vincentmet.customquests.api.IQuestingTexture;
+import com.vincentmet.customquests.api.ITaskType;
+import com.vincentmet.customquests.api.ServerUtils;
+import com.vincentmet.customquests.helpers.BooleanContainer;
+import com.vincentmet.customquests.helpers.IntCounter;
+import com.vincentmet.customquests.helpers.MouseButton;
+import com.vincentmet.customquests.helpers.PlayerBoundSubtaskReference;
+import com.vincentmet.customquests.helpers.TagHelper;
 import com.vincentmet.customquests.hierarchy.quest.ItemSlideshowTexture;
 import com.vincentmet.customquests.integrations.jei.JEIHelper;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -20,7 +29,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -28,8 +36,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class ItemDetectTaskType implements ITaskType, IItemStacksProvider{
-	private static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(Constants.MODID, "item_detect");
+public class ItemDetectTaskType implements ITaskType, IItemStacksProvider {
+	private static final ResourceLocation ID = new ResourceLocation(Constants.MODID, "item_detect");
 	private static final Component TRANSLATION = Component.translatable(Constants.MODID + ".standardcontent.tasks.item_detect");
 	public static final List<PlayerBoundSubtaskReference> TRACKING_LIST = new ArrayList<>();
 	private int questId;
@@ -113,7 +121,8 @@ public class ItemDetectTaskType implements ITaskType, IItemStacksProvider{
 	
 	@Override
 	public Runnable onSlotHover(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks, LocalPlayer player){
-		return ()->Minecraft.getInstance().screen.renderTooltip(matrixStack, icon.getCurrentItemStack(), mouseX, mouseY);
+		return null;
+        //TODO return ()->Minecraft.getInstance().screen.renderTooltip(matrixStack, icon.getCurrentItemStack(), mouseX, mouseY);
 	}
 	
 	@Override
@@ -133,7 +142,7 @@ public class ItemDetectTaskType implements ITaskType, IItemStacksProvider{
 	@Override
 	public Consumer<MouseButton> onSlotClick(LocalPlayer player){
 		return (mouseButton)->{
-			if(!icon.getResourceLocation().equals(ResourceLocation.fromNamespaceAndPath("minecraft","air"))){
+			if(!icon.getResourceLocation().equals(new ResourceLocation("minecraft","air"))){
 				if(mouseButton == MouseButton.LEFT){
 					if(JEIHelper.hasRecipe(icon.getCurrentItemStack()))JEIHelper.openRecipe(icon.getCurrentItemStack());
 				}else if(mouseButton == MouseButton.RIGHT){
@@ -181,25 +190,25 @@ public class ItemDetectTaskType implements ITaskType, IItemStacksProvider{
 					String jsonPrimitiveStringValue = jsonPrimitive.getAsString();
 					ogRL = ResourceLocation.tryParse(jsonPrimitiveStringValue);
 					if(ogRL != null){
-						if(!TagHelper.Items.doesTagExist(ogRL) && !ForgeRegistries.ITEMS.containsKey(ogRL)){
+						if(!TagHelper.Items.doesTagExist(ogRL) && !BuiltInRegistries.ITEM.containsKey(ogRL)){
 							CustomQuestsLogger.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > item': Value is not a valid item that exists in the game, please use a valid item, defaulting to 'minecraft:grass_block'!");
-							ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
+							ogRL = BuiltInRegistries.ITEM.getKey(Items.GRASS_BLOCK);
 						}
 					}else{
 						CustomQuestsLogger.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > item': Value is not a valid item ResourceLocation, defaulting to 'minecraft:grass_block'!");
-						ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
+						ogRL = BuiltInRegistries.ITEM.getKey(Items.GRASS_BLOCK);
 					}
 				}else{
 					CustomQuestsLogger.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > item': Value is not a String, defaulting to 'minecraft:grass_block'!");
-					ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
+					ogRL = BuiltInRegistries.ITEM.getKey(Items.GRASS_BLOCK);
 				}
 			}else{
 				CustomQuestsLogger.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > item': Value is not a JsonPrimitive, please use a String, defaulting to 'minecraft:grass_block'!");
-				ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
+				ogRL = BuiltInRegistries.ITEM.getKey(Items.GRASS_BLOCK);
 			}
 		}else{
 			CustomQuestsLogger.warn("'Quest > " + questId + " > tasks > entries > " + taskId + " > sub_tasks > entries > " + subtaskId + " > item': Not detected, defaulting to 'minecraft:grass_block'!");
-			ogRL = ForgeRegistries.ITEMS.getKey(Items.GRASS_BLOCK);
+			ogRL = BuiltInRegistries.ITEM.getKey(Items.GRASS_BLOCK);
 		}
 		
 		if(json.has("count")){
@@ -255,7 +264,7 @@ public class ItemDetectTaskType implements ITaskType, IItemStacksProvider{
 		CompoundTag nbt = ApiUtils.getNbtFromJson(ogNBT);
 		if(TagHelper.Items.doesTagExist(ogRL)){
 			TagHelper.Items.getEntries(ogRL).stream().map(item1 ->{
-				ItemStack stack = new ItemStack(item1, count);
+				ItemStack stack = new ItemStack(item1.get(0), count); //TODO
 				if(nbt!=null){
 					if(stack.getTag() != null){
 						stack.getTag().merge(nbt);
@@ -267,7 +276,7 @@ public class ItemDetectTaskType implements ITaskType, IItemStacksProvider{
 			}).forEach(items::add);
 			icon = new ItemSlideshowTexture(ogRL, items);
 		}else{
-			ItemStack stack = new ItemStack(ForgeRegistries.ITEMS.getValue(ogRL), count);
+			ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.get(ogRL), count);
 			if(nbt!=null){
 				if(stack.getTag() != null){
 					stack.getTag().merge(nbt);

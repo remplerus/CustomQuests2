@@ -3,7 +3,6 @@ package com.vincentmet.customquests.standardcontent.rewardtypes;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.vincentmet.customquests.Constants;
@@ -12,18 +11,18 @@ import com.vincentmet.customquests.api.IRewardType;
 import com.vincentmet.customquests.helpers.MouseButton;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.function.Consumer;
 
 public class CommandRewardType implements IRewardType{
-	private static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(Constants.MODID, "command");
+	private static final ResourceLocation ID = new ResourceLocation(Constants.MODID, "command");
 	private String command = "";
 	private String displayText = "";
 	private Item icon = Items.COMMAND_BLOCK;
@@ -103,7 +102,7 @@ public class CommandRewardType implements IRewardType{
 					String jsonPrimitiveStringValue = jsonPrimitive.getAsString();
 					ResourceLocation rl = ResourceLocation.tryParse(jsonPrimitiveStringValue);
 					if(rl != null){
-						icon = ForgeRegistries.ITEMS.getValue(rl);
+						icon = BuiltInRegistries.ITEM.get(rl);
 					}else{
 						CustomQuestsLogger.warn("'Quest > " + parentQuestId + " > rewards > entries > " + parentRewardId + " > content > icon': Value is not a valid item, please use a valid item id, defaulting to 'minecraft:command_block'!");
 					}
@@ -161,7 +160,7 @@ public class CommandRewardType implements IRewardType{
 		JsonObject json = new JsonObject();
 		json.addProperty("command", command);
 		json.addProperty("text", displayText);
-		json.addProperty("icon", ForgeRegistries.ITEMS.getKey(icon).toString());
+		json.addProperty("icon", BuiltInRegistries.ITEM.getKey(icon).toString());
 		return json;
 	}
 }

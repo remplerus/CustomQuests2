@@ -1,13 +1,14 @@
 package com.vincentmet.customquests.hierarchy.quest;
 
 import com.google.gson.*;
-import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.CustomQuestsLogger;
-import com.vincentmet.customquests.api.*;
+import com.vincentmet.customquests.api.IJsonObjectProcessor;
+import com.vincentmet.customquests.api.IJsonObjectProvider;
+import com.vincentmet.customquests.api.LogicType;
 import com.vincentmet.customquests.helpers.IntCounter;
 import java.util.*;
 
-public class Rewards extends HashMap<Integer, Reward> implements IJsonObjectProcessor, IJsonObjectProvider{
+public class Rewards extends HashMap<Integer, Reward> implements IJsonObjectProcessor, IJsonObjectProvider {
 	private LogicType logicType = LogicType.AND;
 	private final int parentQuestId;
 	

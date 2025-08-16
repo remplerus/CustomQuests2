@@ -2,7 +2,6 @@ package com.vincentmet.customquests.helpers.rendering;
 
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.vincentmet.customquests.Constants;
 import com.vincentmet.customquests.api.ApiUtils;
 import com.vincentmet.customquests.api.IHoverRenderable;
@@ -79,7 +78,8 @@ public class VariableSlot implements IHoverRenderable{
 	public void renderHover(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks){
 		if(ApiUtils.isMouseInBounds(mouseX, mouseY, x, y, x+width, y+height)){
 			TooltipBuffer.tooltipBuffer.add(()->{
-				if(Minecraft.getInstance().screen != null) Minecraft.getInstance().screen.renderTooltip(matrixStack, tooltipLines.stream().map(line -> FormattedCharSequence.forward(line, Style.EMPTY)).collect(Collectors.toList()), mouseX, mouseY);
+				if(Minecraft.getInstance().screen != null) matrixStack.renderTooltip(TooltipBuffer.font, tooltipLines.stream().map(line -> FormattedCharSequence.forward(line, Style.EMPTY)).collect(Collectors.toList()), mouseX, mouseY);
+				//fixme render tooltips
 			});
 		}
 	}
@@ -149,7 +149,7 @@ public class VariableSlot implements IHoverRenderable{
 	}
 	
 	public static class SlotTexture {
-		public static final SlotTexture DEFAULT = new SlotTexture(0, 0, 3, 3, 1, ResourceLocation.fromNamespaceAndPath(Constants.MODID, "textures/gui/slot_scalable.png"));
+		public static final SlotTexture DEFAULT = new SlotTexture(0, 0, 3, 3, 1, new ResourceLocation(Constants.MODID, "textures/gui/slot_scalable.png"));
 		private final ResourceLocation texture;
 		private final int u;
 		private final int v;
